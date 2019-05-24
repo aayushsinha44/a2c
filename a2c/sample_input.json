@@ -1,0 +1,36 @@
+{
+    "vm": [
+        {
+            "hostname": "www.microland.com",
+            "username": "ubuntu",
+            "password": "access_ubuntu",
+            "port": 22,
+            "private_key": null,
+            "passphrase": null
+        },
+        {
+            "hostname": "mail.microland.com",
+            "username": "ubuntu",
+            "password": null,
+            "port": 22,
+            "private_key": "abc",
+            "passphrase": "abc"
+        },
+        {
+            "hostname": "35.56.12.15",
+            "username": "ubuntu",
+            "password": null,
+            "port": 22,
+            "private_key": "abc",
+            "passphrase": "abc"
+        }
+    ],
+    "docker_registry": {
+        "registry_url": "https://my-own-registry.com",
+        "username": "ubuntu",
+        "password": "password"
+    },
+    "kubernetes": {
+        "config-map": ""
+    }
+}
