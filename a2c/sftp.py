@@ -55,7 +55,6 @@ if __name__ == '__main__':
 
     # File
     if os.path.isfile(localpath):
-        print("==========Transfer file=========\n", localpath, remotepath)
         sftp.file_transfer(localpath, remotepath)
     
     # Folder

@@ -1,5 +1,6 @@
 from .nginx import Nginx
-from .constants import SUPPORTED_RUNTIME, NGINX
+from .apache import Apache
+from .constants import SUPPORTED_RUNTIME, NGINX, APACHE
 
 class RuntimeExecution():
 
@@ -28,13 +29,11 @@ class RuntimeExecution():
                 _runtime = Nginx(self.process_id, self.ssh_client, self.process_name[:-1], self.process_port)
                 if _runtime.is_load_balancer():
                     return
-                print(_runtime.nginx_conf_file())
-                print("Stared code saving")
-                _runtime.save_code()
-                _runtime.save_container_info()
-                print('code saved')
 
-            # _runtime.save_container_info()
-            # _runtime.save_code()
+            elif self.process_name == APACHE:
+                _runtime = Apache(self.process_id, self.ssh_client, self.process_name, self.process_port)
+
+            _runtime.save_container_info()
+            _runtime.save_code()
 
     
