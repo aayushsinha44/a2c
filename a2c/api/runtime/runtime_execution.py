@@ -4,12 +4,13 @@ from .constants import SUPPORTED_RUNTIME, NGINX, APACHE
 
 class RuntimeExecution():
 
-    def __init__(self, process_port, process_id, process_name, ssh_client):
+    def __init__(self, process_port, process_id, process_name, ssh_client, docker_client):
         self.process_name=process_name
         self.process_id=process_id
         self.process_name=process_name
         self.ssh_client=ssh_client
         self.process_port=process_port
+        self.docker_client=docker_client
 
     def is_supported(self):
         '''
@@ -26,14 +27,20 @@ class RuntimeExecution():
         if self.is_supported():
 
             if self.process_name == NGINX:
-                _runtime = Nginx(self.process_id, self.ssh_client, self.process_name[:-1], self.process_port)
+                _runtime = Nginx(self.process_id, self.ssh_client, self.process_name[:-1], self.process_port, self.docker_client)
                 if _runtime.is_load_balancer():
                     return
+                _runtime.save_code()
+                _runtime.save_container_info()  
+                _runtime.build_container()
+                _runtime.push_container_docker_registry()
+                _runtime.save_kubernetes_yaml()
 
             elif self.process_name == APACHE:
-                _runtime = Apache(self.process_id, self.ssh_client, self.process_name, self.process_port)
+                pass
+                # _runtime = Apache(self.process_id, self.ssh_client, self.process_name, self.process_port)
 
-            _runtime.save_container_info()
-            _runtime.save_code()
+            # _runtime.save_container_info()
+            # _runtime.save_code()
 
     

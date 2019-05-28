@@ -3,10 +3,9 @@ import re
 
 class Nginx(Runtime):
 
-    def __init__(self, proccess_id, ssh_client, proccess_name, process_port):
-        super().__init__(ssh_client, proccess_name)
+    def __init__(self, proccess_id, ssh_client, proccess_name, process_port, docker_client):
+        super().__init__(ssh_client, proccess_name, process_port, docker_client)
         self.proccess_id=proccess_id
-        self.process_port=process_port
         
     # Abstract class method
     def generate_container_file(self):
@@ -32,10 +31,11 @@ class Nginx(Runtime):
         # _abs_path=self.ssh_cleint.get_user_data_path()
         # if _abs_path[-1]!='/':
         #     _abs_path += "/"
-        _abs_path = self.process_name
-        if path[0] != '/':
-            _abs_path += '/'
-        return _abs_path + path
+        # _abs_path = self.process_name
+        # if path[0] != '/':
+        #     _abs_path += '/'
+        # return _abs_path + path
+        return path[1:]
         
 
     # Abstract method
@@ -80,14 +80,14 @@ class Nginx(Runtime):
                 _data+=".conf"
             conf_files.append(self.get_data_in_format(
                 '/etc/nginx/sites-enabled/'+file,'/etc/nginx/sites-enabled/'+_data,
-                is_folder=False))
+                is_folder=False, is_sudo=False))
             _, out, _ = self.ssh_cleint.exec_command(cmd)
             x = re.findall('root /.*' , out)
             for line in x:
                 for l in out.split('\n'):
                     if line in l and '#' not in l:
                         _path=line.split(' ')[-1][:-1]
-                        files.append(self.get_data_in_format(_path, _path))
+                        files.append(self.get_data_in_format(_path, _path, is_folder=True, is_sudo=False))
         return files, conf_files
         
 

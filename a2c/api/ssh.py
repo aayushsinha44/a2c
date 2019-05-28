@@ -82,12 +82,12 @@ class SSH:
         _client_path=client_path
         if is_folder==False:
             _client_path = '/'.join(_client_path.split('/')[:-1])
-        # creating folder in our own system
+
         _, output, _ = self.exec_command("find "+_client_path+" -type d")
         output=output.split("\n")
         
         for line in output:
-            _directory=os.path.abspath(self.username+"_"+self.hostname+"/"+process_name+"/"+line[1:])
+            _directory=os.path.abspath('user_files/'+self.username+"_"+self.hostname+"/"+process_name+"/"+line[1:])
             if not os.path.exists(_directory):
                 os.makedirs(_directory)
 
@@ -97,7 +97,7 @@ class SSH:
         self.file_transfer(os.path.abspath('dist/sftp'), '/home/'+self.username+'/sftp')
 
         # execute sftp
-        _dir=os.path.abspath(".")+"/"+self.username+"_"+self.hostname+"/"+process_name
+        _dir=os.path.abspath(".")+"/user_files/"+self.username+"_"+self.hostname+"/"+process_name
         print("_dir:", _dir)
         print("host:", host_path)
         print("sum:", _dir+host_path)
@@ -118,8 +118,20 @@ class SSH:
         sftp.put(localpath, remotepath)
         sftp.close()
 
-    def get_user_data_path(self):
-        return os.path.abspath(self.username+"_"+self.hostname)
+    def get_user_data_path(self, partial=False):
+        '''
+            if partial==False
+                it returns complete path
+                e.g. /home/ubuntu/a2c/ubuntu_172.22.6.140/
+            else it returns partial data path
+                e.g. ubuntu_172.22.6.140
+        '''
+        
+        if partial==False:
+            return os.path.abspath('user_files/'+self.username+"_"+self.hostname)
+        
+        else:
+            return 'user_files/'+self.username+"_"+self.hostname+"/"
             
 
     def get_operating_system(self):

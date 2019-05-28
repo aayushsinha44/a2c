@@ -52,6 +52,9 @@ def arg_handler(argv):
 if __name__ == '__main__':
     sftp=SFTP(HOST, 22, USERNAME, PASSWORD)
     localpath, remotepath = arg_handler(sys.argv[1:])
+    print("SFTP")
+    print("local path:", localpath)
+    print("remote path:", remotepath)
 
     # File
     if os.path.isfile(localpath):

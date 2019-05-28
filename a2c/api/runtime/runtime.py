@@ -1,11 +1,13 @@
 from abc import ABC, abstractmethod
-
+import os
 
 class Runtime(ABC):
 
-    def __init__(self, ssh_client, process_name):
+    def __init__(self, ssh_client, process_name, process_port, docker_client):
         self.ssh_cleint=ssh_client
         self.process_name=process_name
+        self.process_port=process_port
+        self.docker_client=docker_client
     
     @abstractmethod
     def generate_container_file(self):
@@ -68,9 +70,75 @@ class Runtime(ABC):
             # TODO: check for success
 
     def build_container(self):
-        pass
+        self.docker_client.build(self.process_name)
 
-    def push_code_docker_registry(self):
-        pass
+    def push_container_docker_registry(self):
+        self.docker_client.push(self.process_name)
+
+    def save_kubernetes_yaml(self):
+        '''
+            Save kubernetes yaml file for process
+        '''
+        # TODO: os root path
+        _image=self.docker_client.get_tag(self.process_name)
+
+        _yaml = generate_yaml(self.process_name, _image, str(self.process_port))
+        _path = self.ssh_cleint.get_user_data_path() 
+        print(_path)
+        if _path[-1] != "/":
+            _path += "/" 
+        _path += 'kubernetes/'
+        print(_path)
+        if not os.path.exists(_path):
+            os.makedirs(_path)
+
+        _file = open(_path+self.process_name+'.yaml', 'w')
+        _file.write(_yaml)
+        _file.close()
+        
+
+
+
+def generate_yaml(name, image, port, no_replicas=3, service_type="LoadBalancer"):
+    '''
+        Returns kubernetes yaml file 
+    '''
+
+    _yaml = [
+        "apiVersion: extensions/v1beta1",
+        "kind: Deployment",
+        "metadata:",
+        "  name: "+name,
+        "spec:",
+        "  replicas: "+str(no_replicas),
+        "  template: ",
+        "    metadata: ",
+        "      labels: ",
+        "        app: "+name,
+        "    spec:",
+        "      containers:",
+        "        - name: "+name,
+        "          image: "+image,
+        "          ports:",
+        "            - containerPort: "+ port,
+        "",
+        "---",
+        "apiVersion: v1",
+        "kind: Service",
+        "metadata:",
+        "  name: "+name+"-service",
+        "  labels:",
+        "    name: "+name+"-service",
+        "spec:",
+        "  ports:",
+        "    - port: "+port,
+        "      targetPort: "+port,
+        "      protocol: TCP",
+        "  selector:",
+        "    app: "+name,
+        "  type: "+service_type
+    ]
+    return '\n'.join(_yaml)
+    
 
 
