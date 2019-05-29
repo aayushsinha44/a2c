@@ -1,4 +1,3 @@
-import docker
 import os
 from .constants import PASSWORD
 
