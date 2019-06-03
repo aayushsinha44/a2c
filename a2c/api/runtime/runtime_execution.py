@@ -22,25 +22,34 @@ class RuntimeExecution():
             return True
         return False
 
-    def call_runtime(self):
+    def get_runtime(self):
 
         if self.is_supported():
 
             if self.process_name == NGINX:
                 _runtime = Nginx(self.process_id, self.ssh_client, self.process_name[:-1], self.process_port, self.docker_client)
-                if _runtime.is_load_balancer():
-                    return
-                _runtime.save_code()
-                _runtime.save_container_info()  
-                _runtime.build_container()
-                _runtime.push_container_docker_registry()
-                _runtime.save_kubernetes_yaml()
+                return _runtime
 
-            elif self.process_name == APACHE:
-                pass
-                # _runtime = Apache(self.process_id, self.ssh_client, self.process_name, self.process_port)
 
-            # _runtime.save_container_info()
-            # _runtime.save_code()
+    # def call_runtime(self):
+
+    #     if self.is_supported():
+
+    #         if self.process_name == NGINX:
+    #             _runtime = Nginx(self.process_id, self.ssh_client, self.process_name[:-1], self.process_port, self.docker_client)
+    #             if _runtime.is_load_balancer():
+    #                 return
+    #             _runtime.save_code()
+    #             _runtime.save_container_info()  
+    #             _runtime.build_container()
+    #             _runtime.push_container_docker_registry()
+    #             # _runtime.save_kubernetes_yaml()
+
+    #         elif self.process_name == APACHE:
+    #             pass
+    #             # _runtime = Apache(self.process_id, self.ssh_client, self.process_name, self.process_port)
+
+    #         # _runtime.save_container_info()
+    #         # _runtime.save_code()
 
     

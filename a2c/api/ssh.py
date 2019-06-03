@@ -1,5 +1,4 @@
 from paramiko import SSHClient, AutoAddPolicy
-from .constants import USERNAME, HOST, PASSWORD
 import os
 
 class SSH:
@@ -73,7 +72,7 @@ class SSH:
             return error
 
 
-    def scp(self, client_path, process_name, host_path, is_folder=False, is_sudo=False):
+    def scp(self, client_path, process_path, host_path, is_folder=False, is_sudo=False):
         '''
             Moves files to local system
             client_path: Path of the folder which has to be moved to host_path
@@ -86,28 +85,50 @@ class SSH:
         _, output, _ = self.exec_command("find "+_client_path+" -type d")
         output=output.split("\n")
         
+        # Creating folder
         for line in output:
-            _directory=os.path.abspath('user_files/'+self.username+"_"+self.hostname+"/"+process_name+"/"+line[1:])
+            _directory=os.path.abspath('user_files/'+self.username+"_"+self.hostname+"/"+process_path+"/"+line[1:])
             if not os.path.exists(_directory):
                 os.makedirs(_directory)
 
+        if is_folder:
 
-        # transfer sftp build
-        print(os.path.abspath('dist/sftp'), '/home/'+self.username+'/sftp')
-        self.file_transfer(os.path.abspath('dist/sftp'), '/home/'+self.username+'/sftp')
+            _, output, _ = self.exec_command("find "+_client_path+" -type f")
+            output=output.split("\n")
 
-        # execute sftp
-        _dir=os.path.abspath(".")+"/user_files/"+self.username+"_"+self.hostname+"/"+process_name
-        print("_dir:", _dir)
-        print("host:", host_path)
-        print("sum:", _dir+host_path)
-        _, output, error = self.exec_command('chmod +x sftp\n./sftp -l '+client_path+' -r '+_dir+host_path, sudo=is_sudo)
+            # Transfering files
+            for line in output:
+                if len(line) == 0:
+                    continue
+                _localpath=self.get_user_data_path()+'/'+process_path
+                if line[0]!='/':
+                    _localpath += '/'
+                self.get_file(line, _localpath+line)
 
-        print("Output:", output)
-        print("Error:", error)
+        else:
+            _localpath=self.get_user_data_path()+'/'+process_path
+            print("File ", client_path)
+            print("path: ", _localpath+client_path)
+            self.get_file(client_path, _localpath+host_path)
 
-        # delete sftp build
-        self.exec_command("rm -rf sftp")
+        
+
+        # # transfer sftp build
+        # print(os.path.abspath('dist/sftp'), '/home/'+self.username+'/sftp')
+        # self.file_transfer(os.path.abspath('dist/sftp'), '/home/'+self.username+'/sftp')
+
+        # # execute sftp
+        # _dir=os.path.abspath(".")+"/user_files/"+self.username+"_"+self.hostname+"/"+process_name
+        # print("_dir:", _dir)
+        # print("host:", host_path)
+        # print("sum:", _dir+host_path)
+        # _, output, error = self.exec_command('chmod +x sftp\n./sftp -l '+client_path+' -r '+_dir+host_path, sudo=is_sudo)
+
+        # print("Output:", output)
+        # print("Error:", error)
+
+        # # delete sftp build
+        # self.exec_command("rm -rf sftp")
 
         # TODO check success of file transfer
 
@@ -118,13 +139,19 @@ class SSH:
         sftp.put(localpath, remotepath)
         sftp.close()
 
+    def get_file(self, remotepath, localpath):
+        ssh=self.client
+        sftp=ssh.open_sftp()
+        sftp.get(remotepath, localpath)
+        sftp.close()
+
     def get_user_data_path(self, partial=False):
         '''
             if partial==False
                 it returns complete path
-                e.g. /home/ubuntu/a2c/ubuntu_172.22.6.140/
+                e.g. /home/ubuntu/a2c/user_files/ubuntu_172.22.6.140/
             else it returns partial data path
-                e.g. ubuntu_172.22.6.140
+                e.g. user_files/ubuntu_172.22.6.140
         '''
         
         if partial==False:

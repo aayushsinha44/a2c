@@ -3,8 +3,9 @@ import os
 
 class Runtime(ABC):
 
-    def __init__(self, ssh_client, process_name, process_port, docker_client):
+    def __init__(self, ssh_client, process_id, process_name, process_port, docker_client):
         self.ssh_cleint=ssh_client
+        self.process_id=process_id
         self.process_name=process_name
         self.process_port=process_port
         self.docker_client=docker_client
@@ -21,7 +22,7 @@ class Runtime(ABC):
         _path = self.ssh_cleint.get_user_data_path() 
         if _path[-1] != "/":
             _path += "/" 
-        _path += self.process_name + "/"
+        _path += self._get_process_path() + "/"
 
         _file = open(_path+'Dockerfile', 'w')
         _file.write(_container_file)
@@ -62,39 +63,53 @@ class Runtime(ABC):
         for p in path:
             print("------Saving code:", p)
             self.ssh_cleint.scp(client_path=p["source"], 
-                                process_name=self.process_name,
+                                process_path=self._get_process_path(),
                                 host_path=p["destination"],
                                 is_folder=p["is_folder"],
                                 is_sudo=p["is_sudo"])
 
             # TODO: check for success
 
+    def _get_process_path(self):
+        return self.process_id+self.process_name
+
     def build_container(self):
-        self.docker_client.build(self.process_name)
+        self.docker_client.build(self._get_process_path())
 
     def push_container_docker_registry(self):
-        self.docker_client.push(self.process_name)
+        self.docker_client.push(self._get_process_path())
 
-    def save_kubernetes_yaml(self):
-        '''
-            Save kubernetes yaml file for process
-        '''
-        # TODO: os root path
-        _image=self.docker_client.get_tag(self.process_name)
+    def get_port(self):
+        return self.process_port
 
-        _yaml = generate_yaml(self.process_name, _image, str(self.process_port))
-        _path = self.ssh_cleint.get_user_data_path() 
-        print(_path)
-        if _path[-1] != "/":
-            _path += "/" 
-        _path += 'kubernetes/'
-        print(_path)
-        if not os.path.exists(_path):
-            os.makedirs(_path)
+    def get_image(self):
+        return self.docker_client.get_username()+"/"+self._get_process_path()
 
-        _file = open(_path+self.process_name+'.yaml', 'w')
-        _file.write(_yaml)
-        _file.close()
+    def get_name(self):
+        return self.process_name
+
+    def get_process_id(self):
+        return self.process_id
+
+    # def save_kubernetes_yaml(self):
+    #     '''
+    #         Save kubernetes yaml file for process
+    #     '''
+    #     _image=self.docker_client.get_tag(self.process_name)
+
+    #     _yaml = generate_yaml(self.process_name, _image, str(self.process_port))
+    #     _path = self.ssh_cleint.get_user_data_path() 
+    #     print(_path)
+    #     if _path[-1] != "/":
+    #         _path += "/" 
+    #     _path += 'kubernetes/'
+    #     print(_path)
+    #     if not os.path.exists(_path):
+    #         os.makedirs(_path)
+
+    #     _file = open(_path+self.process_name+'.yaml', 'w')
+    #     _file.write(_yaml)
+    #     _file.close()
         
 
 

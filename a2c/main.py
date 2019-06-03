@@ -18,7 +18,7 @@ def generate_sftp_build():
 
 if __name__ == '__main__':
 
-    generate_sftp_build()
+    # generate_sftp_build()
 
     # main()
     password='intern1'
@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
     ssh = SSH(hostname=hostname, port=22, username=username, password=password, pkey=None)
 
-    docker_client = Docker(registry, docker_username, docker_password, ssh)
+    docker_client = Docker(registry, docker_username, docker_password, ssh, dev=True)
     docker_client.login()
 
     # Kubeconfig file
@@ -48,7 +48,7 @@ if __name__ == '__main__':
         runtime_exec = RuntimeExecution(process_tuple[0], process_tuple[1], process_tuple[2], ssh, docker_client)
         if runtime_exec.is_supported():
             print("Started:", process_tuple)
-            runtime_exec.call_runtime()
+            # runtime_exec.call_runtime()
 
     # save kube config file
     _path = ssh.get_user_data_path()+"/"

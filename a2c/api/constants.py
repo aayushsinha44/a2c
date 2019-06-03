@@ -1,3 +1,1 @@
-USERNAME="ubuntu"
-HOST="172.22.6.141"
 PASSWORD="intern1"
