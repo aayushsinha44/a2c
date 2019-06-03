@@ -52,6 +52,6 @@ class Kubernetes():
         yaml=self._yaml
         for service in self._services:
             _tmp=["---"]
-            yaml.append(_tmp)
+            yaml = yaml + _tmp
             yaml = yaml + service
         return '\n'.join(yaml)

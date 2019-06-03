@@ -12,6 +12,8 @@ DEBUG=True
 
 app = Flask(__name__)
 
+# docker run -p 8090:8090 -v /var/run/docker.sock:/var/run/docker.sock intaayushsinhaml/env
+
 '''
 Endpoints:
 
@@ -35,6 +37,7 @@ Endpoints:
 
 /initialize_kubernetes
 /save_container_in_kubernetes_file
+/save_kubernetes_file
 /apply_kubernetes_file
 
 /get_docker_file/<process_id>/<process_name>
@@ -154,7 +157,7 @@ def vm_cred():
     try:
         _json=request.json
 
-        _req =["hostname", "username", "password", "port", "private_key", "passphrase"]
+        _req =["hostname", "username", "password", "port", "pkey", "passphrase"]
         for r in _req:
             if r not in _json:
                 return build_response({"message": "invalid data"}, code=400, success=False)
@@ -216,23 +219,6 @@ def login_vm(username, hostname):
     except Exception as e:
         return build_response({"message": str(e)}, code=500, success=False)
 
-
-@app.route("/logout_vm/<username>/<hostname>")
-def logout_vm(username, hostname):
-    global ssh
-    if not check_vm_cred_exists(username, hostname):
-        return build_response({"message": "no such vm"}, code=400, success=False)
-    if ssh is None:
-        return build_response({"message": "not logged in"}, code=400, success=False)
-    try:
-    
-        ssh.close()
-        clear()
-        return build_response({"message": "logout successful"})
-
-    except Exception as e:
-        return build_response({"message": str(e)}, code=500, success=False)
-
 @app.route("/get_os_info")
 def get_os_info():
     global ssh
@@ -249,14 +235,16 @@ def discover_process():
     for process_tuple in process_port_info:
         runtime_exec = RuntimeExecution(process_tuple[0], process_tuple[1], process_tuple[2], ssh, docker_client)
         if runtime_exec.is_supported():
-            PROCESS_LIST.append({"port": process_tuple[0], 
+            PROCESS_LIST.append({"process_port": process_tuple[0], 
                             "process_id": process_tuple[1], 
                             "process_name": process_tuple[2]})
     return build_response({"data": PROCESS_LIST})
 
 @app.route("/start_containerization/<process_port>/<process_id>/<process_name>")
 def start_containerization(process_port, process_id, process_name):
-    global ssh, docker_client, RUNTIME
+    global ssh, docker_client, RUNTIME, PROCESS_LIST
+
+    print(process_port, process_name, process_id, PROCESS_LIST)
 
     if not is_process_in_process_list(process_port, process_id, process_name):
         return build_response({"message": "invalid data"}, code=400, success=False)
@@ -343,17 +331,59 @@ def save_in_kubernetes_file():
         if kubernetes_object is None:
             return build_response({"message": "initailize kubernetes first"}, code=400, success=False)
         kubernetes_object.add_container(RUNTIME.get_name(), RUNTIME.get_port(), RUNTIME.get_image())
-        kubernetes_object.add_container
+        kubernetes_object.add_service(RUNTIME.get_name(), RUNTIME.get_port())
         return build_response({"message": "container and service is added"})
+    except Exception as e:
+        return build_response({"message": str(e)}, code=500, success=False)
+
+@app.route("/save_kubernetes_file")
+def save_kubernetes_file():
+    try:
+        global kubernetes_object, ssh
+        _yaml=kubernetes_object.get_yaml_file()
+        _path_partial=ssh.get_user_data_path(partial=True)+"/"
+        _path_partial+= 'kubernetes/'
+        if not os.path.exists(_path_partial):
+            os.makedirs(_path_partial)
+        if os.path.exists(_path_partial+"kube.yaml"):
+            _kube_file = open(_path_partial+"kube.yaml", 'w')
+        else:
+            _kube_file = open(_path_partial+"kube.yaml", 'x')
+        _kube_file.write(_yaml)
+        _kube_file.close()
+        return build_response({"message": "saved"})
     except Exception as e:
         return build_response({"message": str(e)}, code=500, success=False)
 
 @app.route("/apply_kubernetes_file")
 def apply_kubernetes_file():
     try:
-
-        pass
+        _path_partial=ssh.get_user_data_path(partial=True)+"/"
+        _kube_config_path = _path_partial + 'kube_config_file'
+        _path_partial+= 'kubernetes/'
+        _kube_yaml_localpath = _path_partial + 'kube.yaml'
+        _cmd='kubectl --kubeconfig '+ _kube_config_path \
+            +"kube_config_file create -f "+ _kube_yaml_localpath
+        print(_cmd)
+        os.system(_cmd)
+        return build_response({"message": "applied"})
     
+    except Exception as e:
+        return build_response({"message": str(e)}, code=500, success=False)
+
+@app.route("/logout_vm/<username>/<hostname>")
+def logout_vm(username, hostname):
+    global ssh
+    if not check_vm_cred_exists(username, hostname):
+        return build_response({"message": "no such vm"}, code=400, success=False)
+    if ssh is None:
+        return build_response({"message": "not logged in"}, code=400, success=False)
+    try:
+    
+        ssh.close()
+        clear()
+        return build_response({"message": "logout successful"})
+
     except Exception as e:
         return build_response({"message": str(e)}, code=500, success=False)
 

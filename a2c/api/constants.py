@@ -1,1 +1,1 @@
-PASSWORD="intern1"
+PASSWORD="docker1"
