@@ -1,4 +1,5 @@
 from api.ssh import SSH
+from api.runtime.constants import TOMCAT
 from api.runtime.runtime_execution import RuntimeExecution
 from api.docker import Docker
 import os
@@ -29,13 +30,30 @@ if __name__ == '__main__':
     # _kube_file_text=_kube_file.read()
     # _kube_file.close()
 
+    BLACKLIST_PID = set()
     
+    _, output, error=ssh.exec_command('ps -ef | grep catalina | ')
+    if int(output) > 1:
+        process_id='23'
+        process_port='23'
+        runtime_exec = RuntimeExecution(process_port=process_port, 
+                                        process_id=process_id, 
+                                        process_name=TOMCAT, 
+                                        ssh_client=ssh, 
+                                        docker_client=docker_client)
+        BLACKLIST_PID.add(process_id)
 
     # print(ssh.get_operating_system())
 
     process_port_info = ssh.get_activate_process_on_port()
     for process_tuple in process_port_info:
-        runtime_exec = RuntimeExecution(process_tuple[0], process_tuple[1], process_tuple[2], ssh, docker_client)
+        if process_tuple[1] in BLACKLIST_PID:
+            continue
+        runtime_exec = RuntimeExecution(process_port=process_tuple[0], 
+                                        process_id=process_tuple[1], 
+                                        process_name=process_tuple[2], 
+                                        ssh_client=ssh, 
+                                        docker_client=docker_client)
         if runtime_exec.is_supported():
             print("Started:", process_tuple)
             runtime_exec.call_runtime()
