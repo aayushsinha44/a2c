@@ -34,8 +34,11 @@ class SSH:
         for line in stdout:
             output=output+line
         output=output.split('\n')
-        if "[sudo]" and "password" in output[1]:
-            output=output[2:]
+        try:
+            if "[sudo]" and "password" in output[1]:
+                output=output[2:]
+        except:
+            pass
         output='\n'.join(output)
         Log.log("Command executed: " + cmd)
         Log.log("Command output: " + output)
@@ -70,7 +73,6 @@ class SSH:
             for line in output:
                 if len(line.split(" ")) == 2:
                     out.append(line)
-            print(output)
             for line in out:
                 ip_port, process = line.split(" ")
                 if len(process.split("/")) == 2:

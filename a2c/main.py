@@ -32,16 +32,19 @@ if __name__ == '__main__':
 
     BLACKLIST_PID = set()
     
-    _, output, error=ssh.exec_command('ps -ef | grep catalina | ')
-    if int(output) > 1:
-        process_id='23'
-        process_port='23'
-        runtime_exec = RuntimeExecution(process_port=process_port, 
-                                        process_id=process_id, 
-                                        process_name=TOMCAT, 
-                                        ssh_client=ssh, 
-                                        docker_client=docker_client)
-        BLACKLIST_PID.add(process_id)
+    try:
+        _, output, error=ssh.exec_command('ps -ef | grep catalina | ')
+        if int(output) > 1:
+            process_id='23'
+            process_port='23'
+            runtime_exec = RuntimeExecution(process_port=process_port, 
+                                            process_id=process_id, 
+                                            process_name=TOMCAT, 
+                                            ssh_client=ssh, 
+                                            docker_client=docker_client)
+            BLACKLIST_PID.add(process_id)
+    except:
+        pass
 
     # print(ssh.get_operating_system())
 
