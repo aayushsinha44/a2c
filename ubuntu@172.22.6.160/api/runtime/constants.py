@@ -1,6 +1,0 @@
-NGINX="nginx:"
-PYTHON="python"
-JAVA="java"
-APACHE="apache2"
-
-SUPPORTED_RUNTIME=[NGINX, PYTHON, JAVA, APACHE]
