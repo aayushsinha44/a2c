@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
     
 
-    # print(ssh.get_operating_system())
+    print(ssh.get_operating_system())
 
     process_port_info = ssh.get_activate_process_on_port()
     for process_tuple in process_port_info:

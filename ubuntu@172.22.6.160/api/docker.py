@@ -57,7 +57,7 @@ class Docker():
             os.system('echo %s|sudo -S %s' % (PASSWORD, _cmd))
         else:
             os.system(_cmd)
-        Log.log("Docker push command: "+_cmd, level="debug")
+        Log.log("Docker push command: "+cmd, level="debug")
 
     def get_tag(self, process_name):
         return self._username+"/"+process_name

@@ -166,9 +166,8 @@ class Nginx(Runtime):
         # return docker file
         _docker_file_data=self._dockerfile_configuration()
         _docker_file=[
-            "FROM ubuntu:18.04",#+_docker_file_data["version"],
-            "RUN apt-get update",
-            "RUN apt-get -y install nginx",
+            "FROM nginx:"+_docker_file_data["version"],
+            "RUN rm /etc/nginx/*"
         ]
         for i in range(len(_docker_file_data["conf_files_source"])):
             # _docker_file.append("COPY "+  \
@@ -182,10 +181,6 @@ class Nginx(Runtime):
                  self._build_absolute_path(_docker_file_data["copy_location_destination"][i]) \
                  + " " + _docker_file_data["copy_location_destination"][i])
         _docker_file.append("EXPOSE "+self.process_port)
-        _docker_file.append("RUN apt clean")
-        # _docker_file.append('CMD ["service", "nginx", "start"]')
-        _docker_file.append('RUN echo "daemon off;" >> /etc/nginx/nginx.conf')
-        _docker_file.append('CMD ["nginx"]')
         _docker_file.append("")
         return '\n'.join(_docker_file)
 
@@ -240,37 +235,26 @@ class Nginx(Runtime):
         _cmd="sudo nginx -t"
         _, output, _ = self.ssh_cleint.exec_command(_cmd, sudo=True)
         output=output.split('\n')
-        # print(output)
-        try:
-            # if password login is not there
-            _nginx_conf_file = output[0].split(' ')[4]
-        except:
-            _nginx_conf_file = output[2].split(' ')[4]
-        conf_files.append(self.get_data_in_format(_nginx_conf_file, '/etc/nginx/nginx.conf', is_folder=False))
+        _nginx_conf_file = output[0].split(' ')[3]
         _cmd="cat "+_nginx_conf_file
         _, output, _ = self.ssh_cleint.exec_command(_cmd, sudo=True)
-        out=output
-        # print(out, _cmd)
+        out=output.split('\n')
+        
         x = re.findall('include /.*' , out)
         for line in x:
             for l in out.split('\n'):
-                # not a comment
                 if line in l and '#' not in l:
                     _path=line.split(' ')[-1][:-1]
                     if "*" in _path or ".conf" in _path:
                         _path = _path.split('/')[:-1]
-                        _path = '/'.join(_path)
-                    _path=_path.strip()
-                    if _path[-1] == ';':
-                        _path=_path[:-1]
+                    
                     # dependencies - modules-enabled
                     files.append(self.get_data_in_format(_path, _path, is_folder=True, is_sudo=False))
-                    # print(_path)
-                    cmd="ls -p "+ _path +" | grep -v /" # files only
+                    
+                    cmd="ls -p "+ _path +" | grep -d /" # files only
                     _, output, error = self.ssh_cleint.exec_command(cmd)
                     output=output.split('\n')
-                    # print(output, cmd)
-                    
+
                     if error == "":
                         # static files path
                         for file in output:
@@ -278,18 +262,19 @@ class Nginx(Runtime):
                             if _path != '/':
                                 __path += '/'
                             cmd="cat "+__path+file
-                            _, _out, _ = self.ssh_cleint.exec_command(cmd)
-                            # print("out", out)
+                            _, out, _ = self.ssh_cleint.exec_command(cmd)
+
                             # static files
-                            _x = re.findall('root /.*' , _out)
-                            for line in _x:
-                                for l in _out.split('\n'):
+                            x = re.findall('root /.*' , out)
+                            for line in x:
+                                for l in out.split('\n'):
                                     if line in l and '#' not in l:
                                         _path=line.split(' ')[-1][:-1]
                                         files.append(self.get_data_in_format(_path, _path, is_folder=True, is_sudo=False))
 
         # search for path
         x = re.findall('/.*/.*' , out)
+
         return files, conf_files
         
 
