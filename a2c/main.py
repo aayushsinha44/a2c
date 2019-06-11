@@ -33,10 +33,12 @@ if __name__ == '__main__':
     BLACKLIST_PID = set()
     
     try:
-        _, output, error=ssh.exec_command('ps -ef | grep catalina | ')
+        _, output, error=ssh.exec_command('ps -ef | grep -c catalina')
         if int(output) > 1:
-            process_id='23'
-            process_port='23'
+            _, output, error=ssh.exec_command('ps -ef | grep catalina | sed -n \'1p\' | awk \'{print $2}\')
+
+            process_id = output
+            process_port='8080'
             runtime_exec = RuntimeExecution(process_port=process_port, 
                                             process_id=process_id, 
                                             process_name=TOMCAT, 
