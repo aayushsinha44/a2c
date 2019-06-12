@@ -4,7 +4,7 @@ import os
 class Runtime(ABC):
 
     def __init__(self, ssh_client, process_id, process_name, process_port, docker_client):
-        self.ssh_cleint=ssh_client
+        self.ssh_client=ssh_client
         self.process_id=process_id
         self.process_name=process_name
         self.process_port=process_port
@@ -19,7 +19,7 @@ class Runtime(ABC):
         # save container_information in the local 
         
         _container_file = self.generate_container_file()
-        _path = self.ssh_cleint.get_user_data_path() 
+        _path = self.ssh_client.get_user_data_path() 
         if _path[-1] != "/":
             _path += "/" 
         _path += self._get_process_path() + "/"
@@ -62,7 +62,7 @@ class Runtime(ABC):
         # print(path, '==========================')
         for p in path:
             print("------Saving code:", p)
-            self.ssh_cleint.scp(client_path=p["source"], 
+            self.ssh_client.scp(client_path=p["source"], 
                                 process_path=self._get_process_path(),
                                 host_path=p["destination"],
                                 is_folder=p["is_folder"],
@@ -98,7 +98,7 @@ class Runtime(ABC):
     #     _image=self.docker_client.get_tag(self.process_name)
 
     #     _yaml = generate_yaml(self.process_name, _image, str(self.process_port))
-    #     _path = self.ssh_cleint.get_user_data_path() 
+    #     _path = self.ssh_client.get_user_data_path() 
     #     print(_path)
     #     if _path[-1] != "/":
     #         _path += "/" 
