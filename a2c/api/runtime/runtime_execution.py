@@ -53,8 +53,6 @@ class RuntimeExecution():
                                 self.process_name[:-1], 
                                 self.process_port, 
                                 self.docker_client)
-                if _runtime.is_load_balancer():
-                    return
 
             elif self.process_name == TOMCAT:
                 _runtime = Tomcat(self.process_id, 

@@ -20,6 +20,7 @@ class Kubernetes():
             "      containers:",
         ]
         self._services=[]
+        self._persistent_volumes=[]
 
     def add_container(self, name, port, image):
         self._yaml=self._yaml + [
@@ -40,13 +41,28 @@ class Kubernetes():
             "spec:",
             "  ports:",
             "    - port: "+port,
-            "      targetPort: "+port,
-            "      protocol: TCP",
+            # "      targetPort: "+port,
+            # "      protocol: TCP",
             "  selector:",
             "    app: "+name,
             "  type: "+service_type
         ]
         self._services.append(_service)
+
+    def add_persistent_volume(self, name, memory='200'):
+        _pt=[
+            "kind: PersistentVolumeClaim",
+            "apiVersion: v1",
+            "metadata:",
+            "  name: "+name+"-volumeclaim",
+            "spec:",
+            "  accessModes:",
+            "    - ReadWriteOnce",
+            "  resources:",
+            "    requests:",
+            "      storage: "+memory+"Gi"
+        ]
+        self._persistent_volumes.append(_pt)
 
     def get_yaml_file(self):
         yaml=self._yaml
@@ -54,4 +70,8 @@ class Kubernetes():
             _tmp=["---"]
             yaml = yaml + _tmp
             yaml = yaml + service
+        for pt in self._persistent_volumes:
+            _tmp=['---']
+            yaml = yaml + _tmp
+            yaml = yaml + pt
         return '\n'.join(yaml)

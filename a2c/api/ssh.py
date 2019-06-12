@@ -125,25 +125,6 @@ class SSH:
             self.get_file(client_path, _localpath+host_path)
             Log.log("Transferring file from "+line+" to "+_localpath+host_path, level="debug")
 
-        
-
-        # # transfer sftp build
-        # print(os.path.abspath('dist/sftp'), '/home/'+self.username+'/sftp')
-        # self.file_transfer(os.path.abspath('dist/sftp'), '/home/'+self.username+'/sftp')
-
-        # # execute sftp
-        # _dir=os.path.abspath(".")+"/user_files/"+self.username+"_"+self.hostname+"/"+process_name
-        # print("_dir:", _dir)
-        # print("host:", host_path)
-        # print("sum:", _dir+host_path)
-        # _, output, error = self.exec_command('chmod +x sftp\n./sftp -l '+client_path+' -r '+_dir+host_path, sudo=is_sudo)
-
-        # print("Output:", output)
-        # print("Error:", error)
-
-        # # delete sftp build
-        # self.exec_command("rm -rf sftp")
-
         # TODO check success of file transfer
 
 
