@@ -25,6 +25,8 @@ class Tomcat(Runtime):
         for file in self._files:
             _docker_file.append("COPY "+self.build_path(file["destination"])+" " + self._CATALINA_HOME_CONTAINER + "webapps/" + file["source"].split('/')[-1])
         
+        _docker_file.append("RUN rm -rf " + self._CATALINA_HOME_CONTAINER + "webapps/ROOT")
+
         _docker_file.append("EXPOSE " + self.process_port)
         _docker_file.append("")
 
