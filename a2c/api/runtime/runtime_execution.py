@@ -46,7 +46,8 @@ class RuntimeExecution():
     def call_runtime(self):
 
         if self.is_supported():
-
+            _runtime=None
+            print(self.process_name, self.process_id)
             if self.process_name == NGINX:
                 _runtime = Nginx(self.process_id, 
                                 self.ssh_client, 

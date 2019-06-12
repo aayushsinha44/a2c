@@ -14,7 +14,7 @@ if __name__ == '__main__':
     # main()
     password='intern1'
     username='ubuntu'
-    hostname='172.22.6.140'
+    hostname='172.22.6.141'
 
     docker_username="intaayushsinhaml"
     docker_password="aayushsinha"
@@ -32,21 +32,22 @@ if __name__ == '__main__':
 
     BLACKLIST_PID = set()
     
-    try:
-        _, output, error=ssh.exec_command('ps -ef | grep -c catalina')
-        if int(output) > 1:
-            _, output, error=ssh.exec_command('ps -ef | grep catalina | sed -n \'1p\' | awk \'{print $2}\')
-
-            process_id = output
-            process_port='8080'
-            runtime_exec = RuntimeExecution(process_port=process_port, 
-                                            process_id=process_id, 
-                                            process_name=TOMCAT, 
-                                            ssh_client=ssh, 
-                                            docker_client=docker_client)
-            BLACKLIST_PID.add(process_id)
-    except:
-        pass
+    # try:
+    _, output, error=ssh.exec_command('ps -ef | grep -c catalina')
+    if int(output) > 1:
+        _, output, error=ssh.exec_command('ps -ef | grep catalina | sed -n \'1p\' | awk \'{print $2}\'')
+        # print(output)
+        process_id = str(output.split('\n')[0])
+        process_port='8080'
+        runtime_exec = RuntimeExecution(process_port=process_port, 
+                                        process_id=process_id, 
+                                        process_name=TOMCAT, 
+                                        ssh_client=ssh, 
+                                        docker_client=docker_client)
+        runtime_exec.call_runtime()
+        BLACKLIST_PID.add(process_id)
+    # except Exception as e:
+    #     print(e)
 
     # print(ssh.get_operating_system())
 

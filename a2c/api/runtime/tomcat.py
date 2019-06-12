@@ -6,13 +6,35 @@ class Tomcat(Runtime):
         super().__init__(ssh_client, process_id, proccess_name, process_port, docker_client)
         self._CATALINA_HOME = None
         self._CATALINA_BASE = None
+        self._CATALINA_BASE_CONTAINER = "/usr/local/tomcat/"
+        self._CATALINA_HOME_CONTAINER = "/usr/local/tomcat/"
         self._TOMCAT_VERSION = None
+        self._files=[]
+        self.set_env_variables()
+        self.tomcat_version()
+        self.__populate_files()
+        
 
 
     # Abstract class method
     def generate_container_file(self):
         # return docker file
-        pass
+        _docker_file = [
+            "FROM tomcat:"+self._TOMCAT_VERSION+"",
+        ]
+        for file in self._files:
+            _docker_file.append("COPY "+self.build_path(file["destination"])+" " + self._CATALINA_HOME_CONTAINER + "webapps/" + file["source"].split('/')[-1])
+        
+        _docker_file.append("EXPOSE " + self.process_port)
+        _docker_file.append("")
+
+        _docker_file_string = "\n".join(_docker_file)
+        return _docker_file_string
+
+    def build_path(self, path):
+        if path[0] == '/':
+            return path[1:]
+        return path
 
     # Abstract method
     def get_code_folder_path(self):
@@ -21,14 +43,29 @@ class Tomcat(Runtime):
             [
                 {
                     "source": '/var/www/html'
-                    "desitnation": 'var/www/html'
+                    "desitnation": '/var/www/html'
                     "is_folder": True,
                     "is_sudo: False
                 }
             ]
-        '''
-        pass
-        #self.get_data_in_format()
+        '''        
+        return self._files
+
+
+    def __populate_files(self):
+        _cmd_for_warfile = "ls -p "+self._CATALINA_HOME
+        if _cmd_for_warfile[:-1] != '/':
+            _cmd_for_warfile += '/'
+        
+        _cmd_for_warfile += "webapps/ | grep -v / | grep  \".war\""
+        _, output, _ = self.ssh_client.exec_command(_cmd_for_warfile)
+
+        for line in output.split('\n'):
+            if len(line) == 0:
+                continue
+            _line=self._CATALINA_HOME + '/webapps/'+line
+            self._files.append(self.get_data_in_format(source=_line, destination=_line, is_folder=False))
+
 
     def tomcat_version(self):
         '''
@@ -50,7 +87,7 @@ class Tomcat(Runtime):
             JVM Version:    11.0.3+7-Ubuntu-1ubuntu218.04.1
             JVM Vendor:     Oracle Corporation
         '''
-        _cmd = 'java -cp '+self._CATALINA_HOME+'/lib/catalina.jar org.apache.catalina.util.ServerInfo | sed -n \'1p\' | awk \'{print $2}\''
+        _cmd = 'java -cp '+self._CATALINA_HOME+'/lib/catalina.jar org.apache.catalina.util.ServerInfo | sed -n \'1p\' | awk \'{print $4}\''
         _, output, error = self.ssh_client.exec_command(_cmd)
 
         ver = (output.split('/')[1]).split('.')
