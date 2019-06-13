@@ -13,6 +13,7 @@ class Tomcat(Runtime):
         self.set_env_variables()
         self.tomcat_version()
         self.__populate_files()
+        #self._foo()
         
 
 
@@ -114,4 +115,6 @@ class Tomcat(Runtime):
         self._CATALINA_BASE = result[0].split('=')[1]
 
 
-        
+    def _foo(self):
+        _, output, error = self.ssh_client.exec_command("cat /usr/local/apache-tomcat9/conf/server.xml")
+        print(output)

@@ -3,11 +3,48 @@ from api.runtime.constants import TOMCAT
 from api.runtime.runtime_execution import RuntimeExecution
 from api.docker import Docker
 import os
+from xml.dom import minidom
 
 def generate_sftp_build():
 
     os.system("rm -rf build/ dist/ stfp.spec")
     os.system("pyinstaller --onefile sftp.py")
+
+def find_tomcat_port(process_id):
+    tomcat_ports = []
+
+    process_port_info = ssh.get_activate_process_on_port()
+
+    #find tomcat ports
+    for process_tuple in process_port_info:
+        if process_tuple[1] == process_id:
+            tomcat_ports.append(process_tuple[0])
+    #code for finding http port
+    _cmd_for_env_var = 'ps -ef | grep catalina | sed -n \'1p\''
+    _, output, error = ssh.exec_command(_cmd_for_env_var)
+
+    words = output.split()
+
+    result = [i for i in words if i.startswith('-Dcatalina.home')]
+    _CATALINA_HOME = result[0].split('=')[1]
+
+    result = [i for i in words if i.startswith('-Dcatalina.base')]
+    _CATALINA_BASE = result[0].split('=')[1]
+
+    _, output, _error = ssh.exec_command('cat ' + _CATALINA_HOME + '/conf/server.xml')
+
+    xmldoc = minidom.parseString(output)
+    connector_list = xmldoc.getElementsByTagName('Connector')
+    print(len(connector_list))
+    for c in connector_list:
+        print(c.attributes['port'].value)
+        print(c.attributes['protocol'].value)
+
+
+
+
+
+
 
 if __name__ == '__main__':
 
@@ -36,9 +73,9 @@ if __name__ == '__main__':
     _, output, error=ssh.exec_command('ps -ef | grep -c catalina')
     if int(output) > 1:
         _, output, error=ssh.exec_command('ps -ef | grep catalina | sed -n \'1p\' | awk \'{print $2}\'')
-        # print(output)
+
         process_id = str(output.split('\n')[0])
-        process_port='8080'
+        process_port = find_tomcat_port(process_id)
         runtime_exec = RuntimeExecution(process_port=process_port, 
                                         process_id=process_id, 
                                         process_name=TOMCAT, 
