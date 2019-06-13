@@ -36,7 +36,7 @@ class Nginx(Runtime):
         return '\n'.join(_docker_file)
 
     def _build_absolute_path(self, path):
-        # _abs_path=self.ssh_cleint.get_user_data_path()
+        # _abs_path=self.ssh_client.get_user_data_path()
         # if _abs_path[-1]!='/':
         #     _abs_path += "/"
         # _abs_path = self.process_name
@@ -65,7 +65,7 @@ class Nginx(Runtime):
         '''
             Returns version of nginx
         '''
-        _, _, output = self.ssh_cleint.exec_command('nginx -v')
+        _, _, output = self.ssh_client.exec_command('nginx -v')
         output=output.split(" ")[-2].split('/')[-1]
         return output
     
@@ -84,7 +84,7 @@ class Nginx(Runtime):
         conf_files=[]
 
         _cmd="sudo nginx -t"
-        _, output, _ = self.ssh_cleint.exec_command(_cmd, sudo=True)
+        _, output, _ = self.ssh_client.exec_command(_cmd, sudo=True)
         output=output.split('\n')
         # print(output)
         try:
@@ -94,7 +94,7 @@ class Nginx(Runtime):
             _nginx_conf_file = output[2].split(' ')[4]
         conf_files.append(self.get_data_in_format(_nginx_conf_file, '/etc/nginx/nginx.conf', is_folder=False))
         _cmd="cat "+_nginx_conf_file
-        _, output, _ = self.ssh_cleint.exec_command(_cmd, sudo=True)
+        _, output, _ = self.ssh_client.exec_command(_cmd, sudo=True)
         out=output
         # print(out, _cmd)
         x = re.findall('include /.*' , out)
@@ -112,7 +112,7 @@ class Nginx(Runtime):
                     # dependencies - modules-enabled
                     files.append(self.get_data_in_format(_path, _path, is_folder=True, is_sudo=False))
                     cmd="ls -p "+ _path +" | grep -v /" # files only
-                    _, output, error = self.ssh_cleint.exec_command(cmd)
+                    _, output, error = self.ssh_client.exec_command(cmd)
                     output=output.split('\n')
                     
                     if error == "":
@@ -122,7 +122,7 @@ class Nginx(Runtime):
                             if _path != '/':
                                 __path += '/'
                             cmd="cat "+__path+file
-                            _, _out, _ = self.ssh_cleint.exec_command(cmd)
+                            _, _out, _ = self.ssh_client.exec_command(cmd)
                             # print("out", out)
                             # static files
                             _x = re.findall('root /.*' , _out)
@@ -200,7 +200,7 @@ class Nginx(Runtime):
 #         return '\n'.join(_docker_file)
 
 #     def _build_absolute_path(self, path):
-#         # _abs_path=self.ssh_cleint.get_user_data_path()
+#         # _abs_path=self.ssh_client.get_user_data_path()
 #         # if _abs_path[-1]!='/':
 #         #     _abs_path += "/"
 #         # _abs_path = self.process_name
@@ -229,7 +229,7 @@ class Nginx(Runtime):
 #         '''
 #             Returns version of nginx
 #         '''
-#         _, _, output = self.ssh_cleint.exec_command('nginx -v')
+#         _, _, output = self.ssh_client.exec_command('nginx -v')
 #         output=output.split(" ")[-2].split('/')[-1]
 #         return output
     
@@ -239,7 +239,7 @@ class Nginx(Runtime):
 #         '''
 
 #         cmd="ls -p /etc/nginx/sites-enabled | grep -v /" # files only
-#         _, output, _ = self.ssh_cleint.exec_command(cmd)
+#         _, output, _ = self.ssh_client.exec_command(cmd)
 #         output=output.split('\n')
 #         files = []
 #         conf_files=[]
@@ -256,7 +256,7 @@ class Nginx(Runtime):
 #             # conf_files.append(self.get_data_in_format(
 #             #     '/etc/nginx/sites-enabled/'+file,'/etc/nginx/sites-enabled/'+_data,
 #             #     is_folder=False, is_sudo=False))
-#             _, out, _ = self.ssh_cleint.exec_command(cmd)
+#             _, out, _ = self.ssh_client.exec_command(cmd)
 
 #             # static files
 #             x = re.findall('root /.*' , out)
@@ -268,7 +268,7 @@ class Nginx(Runtime):
 
 #         # geo files
 #         cmd="cat /etc/nginx/nginx.conf"
-#         _, out, _ = self.ssh_cleint.exec_command(cmd)
+#         _, out, _ = self.ssh_client.exec_command(cmd)
 #         x = re.findall('geoip_country .*' , out)
 #         for line in x:
 #             for l in out.split('\n'):
