@@ -21,13 +21,28 @@ class Kubernetes():
         ]
         self._services=[]
         self._persistent_volumes=[]
+        self._volumes=["      containers:"]
 
-    def add_container(self, name, port, image):
+    def add_container(self, name, port, image, mount_path=None):
         self._yaml=self._yaml + [
             "        - name: "+name,
             "          image: "+image,
             "          ports:",
             "            - containerPort: "+ port
+        ]
+        
+        if mount_path is not None:
+            self._yaml += [
+                "          volumeMounts:",
+                "            - name: "+name+"-persistent-storage",
+                "              mountPath: "+mount_path,
+            ]
+
+    def add_volume(self, name):
+        self._volumes += [
+            "            - name: "+name+"-persistent-storage",
+            "              persistentVolumeClaim:",
+            "                claimName: "+name+"-volumeclaim"
         ]
 
     def add_service(self, name, port, service_type="LoadBalancer"):
@@ -66,6 +81,8 @@ class Kubernetes():
 
     def get_yaml_file(self):
         yaml=self._yaml
+        for v in self._volumes:
+            yaml += v
         for service in self._services:
             _tmp=["---"]
             yaml = yaml + _tmp
