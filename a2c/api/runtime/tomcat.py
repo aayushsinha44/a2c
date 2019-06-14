@@ -9,11 +9,12 @@ class Tomcat(Runtime):
         self._CATALINA_BASE_CONTAINER = "/usr/local/tomcat/"
         self._CATALINA_HOME_CONTAINER = "/usr/local/tomcat/"
         self._TOMCAT_VERSION = None
-        self._files=[]
+        self._conf_files = []
+        self._files = []
+        self._war_files=[]
         self.set_env_variables()
         self.tomcat_version()
         self.__populate_files()
-        #self._foo()
         
 
 
@@ -23,16 +24,17 @@ class Tomcat(Runtime):
         _docker_file = [
             "FROM tomcat:"+self._TOMCAT_VERSION+"",
         ]
-        for file in self._files:
+        _docker_file.append("RUN rm -rf " + self._CATALINA_HOME_CONTAINER + "webapps/ROOT")
+        for file in self._war_files:
             _docker_file.append("COPY "+self.build_path(file["destination"])+" " + self._CATALINA_HOME_CONTAINER + "webapps/" + file["source"].split('/')[-1])
         
-        _docker_file.append("RUN rm -rf " + self._CATALINA_HOME_CONTAINER + "webapps/ROOT")
+        for file in self._conf_files:
+            _docker_file.append("COPY "+self.build_path(file["destination"]) + " " + self._CATALINA_HOME_CONTAINER + "conf/" + file["source"].split('/')[-1])
 
         _docker_file.append("EXPOSE " + self.process_port)
         _docker_file.append("")
 
-        _docker_file_string = "\n".join(_docker_file)
-        return _docker_file_string
+        return "\n".join(_docker_file)
 
     def build_path(self, path):
         if path[0] == '/':
@@ -67,7 +69,23 @@ class Tomcat(Runtime):
             if len(line) == 0:
                 continue
             _line=self._CATALINA_HOME + '/webapps/'+line
+            self._war_files.append(self.get_data_in_format(source=_line, destination=_line, is_folder=False))
             self._files.append(self.get_data_in_format(source=_line, destination=_line, is_folder=False))
+        
+        #Copying server.xml, web.xml, tomcat-users.xml
+        _address = self._CATALINA_HOME + '/conf/'
+        self._conf_files.append(self.get_data_in_format(source=_address+'server.xml', destination=_address+'server.xml', is_folder=False))
+        self._files.append(self.get_data_in_format(source=_address+'server.xml', destination=_address+'server.xml', is_folder=False))
+
+        self._conf_files.append(self.get_data_in_format(source=_address+'web.xml', destination=_address+'web.xml', is_folder=False))
+        self._files.append(self.get_data_in_format(source=_address+'web.xml', destination=_address+'web.xml', is_folder=False))
+
+        self._conf_files.append(self.get_data_in_format(source=_address+'tomat-users.xml', destination=_address+'tomcat-users.xml', is_folder=False))
+        self._files.append(self.get_data_in_format(source=_address+'tomcat-users.xml', destination=_address+'tomcat-users.xml', is_folder=False))
+
+        
+        
+
 
 
     def tomcat_version(self):
@@ -113,8 +131,3 @@ class Tomcat(Runtime):
 
         result = [i for i in words if i.startswith('-Dcatalina.base')]
         self._CATALINA_BASE = result[0].split('=')[1]
-
-
-    def _foo(self):
-        _, output, error = self.ssh_client.exec_command("cat /usr/local/apache-tomcat9/conf/server.xml")
-        print(output)

@@ -19,9 +19,10 @@ def find_tomcat_port(process_id):
     for process_tuple in process_port_info:
         if process_tuple[1] == process_id:
             tomcat_ports.append(process_tuple[0])
+
     #code for finding http port
     _cmd_for_env_var = 'ps -ef | grep catalina | sed -n \'1p\''
-    _, output, error = ssh.exec_command(_cmd_for_env_var)
+    _, output, _ = ssh.exec_command(_cmd_for_env_var)
 
     words = output.split()
 
@@ -35,16 +36,16 @@ def find_tomcat_port(process_id):
 
     xmldoc = minidom.parseString(output)
     connector_list = xmldoc.getElementsByTagName('Connector')
-    print(len(connector_list))
+    #print(len(connector_list))
+
+    ret_port = '8080'
     for c in connector_list:
-        print(c.attributes['port'].value)
-        print(c.attributes['protocol'].value)
-
-
-
-
-
-
+        _port = c.attributes['port'].value
+        _protocol = c.attributes['protocol'].value
+        if(_protocol == 'HTTP/1.1' and _port in tomcat_ports):
+            ret_port = _port
+    
+    return ret_port
 
 if __name__ == '__main__':
 
