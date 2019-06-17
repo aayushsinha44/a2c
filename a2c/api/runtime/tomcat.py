@@ -109,7 +109,7 @@ class Tomcat(Runtime):
             JVM Vendor:     Oracle Corporation
         '''
         _cmd = 'java -cp '+self._CATALINA_HOME+'/lib/catalina.jar org.apache.catalina.util.ServerInfo | sed -n \'1p\' | awk \'{print $4}\''
-        _, output, error = self.ssh_client.exec_command(_cmd)
+        _, output, _ = self.ssh_client.exec_command(_cmd)
 
         ver = (output.split('/')[1]).split('.')
         version = ver[0]+"."+ver[1]
@@ -122,7 +122,7 @@ class Tomcat(Runtime):
                 CATALINA_HOME, CATALINA_BASE
         '''
         _cmd_for_env_var = 'ps -ef | grep catalina | sed -n \'1p\''
-        _, output, error = self.ssh_client.exec_command(_cmd_for_env_var)
+        _, output, _ = self.ssh_client.exec_command(_cmd_for_env_var)
 
         words = output.split()
 

@@ -3,7 +3,7 @@ import logging
 class Log():
 
     logging.basicConfig(filename='file.log', 
-                    format='%(asctime)s %(message)s', 
+                    format='%(name)s - %(levelname)s - %(message)s', 
                     filemode='w') 
 
     _logger=logging.getLogger()

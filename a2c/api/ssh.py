@@ -156,6 +156,14 @@ class SSH:
         
         else:
             return 'user_files/'+self.username+"_"+self.hostname+"/"
+
+    def get_kube_config_path(self):
+        '''
+            Returns the path of kube_config_file
+        '''
+        _path_partial=self.get_user_data_path(partial=True)+"/"
+        _kube_config_path = _path_partial + 'kube_config_file'
+        return _kube_config_path
             
 
     def get_operating_system(self):
