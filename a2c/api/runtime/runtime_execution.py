@@ -1,7 +1,8 @@
 from .nginx import Nginx
 from .apache import Apache
 from .tomcat import Tomcat
-from .constants import SUPPORTED_RUNTIME, NGINX, APACHE, TOMCAT
+from .mysql import MySQL
+from .constants import SUPPORTED_RUNTIME, NGINX, APACHE, TOMCAT, MYSQL
 
 class RuntimeExecution():
 
@@ -23,7 +24,7 @@ class RuntimeExecution():
             return True
         return False
 
-    def get_runtime(self):
+    def get_runtime(self, mysql_db_username=None, mysql_db_password=None):
 
         if self.is_supported():
 
@@ -40,10 +41,19 @@ class RuntimeExecution():
                                 self.process_name, 
                                 self.process_port, 
                                 self.docker_client)
+
+            elif self.process_name == MYSQL:
+                _runtime = MySQL(self.process_id, 
+                                self.ssh_client, 
+                                self.process_name, 
+                                self.process_port, 
+                                self.docker_client,
+                                mysql_db_username,
+                                mysql_db_password)
             return _runtime
 
 
-    def call_runtime(self):
+    def call_runtime(self, mysql_db_username=None, mysql_db_password=None):
 
         if self.is_supported():
             _runtime=None
@@ -61,6 +71,15 @@ class RuntimeExecution():
                                 self.process_name, 
                                 self.process_port, 
                                 self.docker_client)
+
+            elif self.process_name == MYSQL:
+                _runtime = MySQL(self.process_id, 
+                                self.ssh_client, 
+                                self.process_name, 
+                                self.process_port, 
+                                self.docker_client,
+                                mysql_db_username,
+                                mysql_db_password)
 
             _runtime.save_code()
             _runtime.save_container_info()  

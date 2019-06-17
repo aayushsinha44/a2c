@@ -71,7 +71,7 @@ class Kubernetes():
         ]
         self._services.append(_service)
 
-    def add_persistent_volume(self, name, memory='200'):
+    def add_persistent_volume(self, name, memory='20'):
         _pt=[
             "kind: PersistentVolumeClaim",
             "apiVersion: v1",
