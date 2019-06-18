@@ -4,7 +4,7 @@ import subprocess
 
 class Kubernetes():
 
-    def __init__(self, name, ssh_client, no_replicas=3):
+    def __init__(self, name, ssh_client, no_replicas=1):
         self.name=name
         self.no_replicas=no_replicas
         self._yaml=[
@@ -26,13 +26,39 @@ class Kubernetes():
         self._volumes=["      volumes:"]
         self._ssh_client=ssh_client
 
-    def add_container(self, name, port, image, mount_path=None, volume_name=None):
+    def add_container(self, name, port, image, env=None, mount_path=None, volume_name=None):
         if volume_name is None:
             volume_name=name
         self._yaml=self._yaml + [
             "        - name: "+name,
             "          image: "+image,
         ]
+
+        if env is not None:
+            self._yaml=self._yaml + [
+                "          env:",
+            ]
+
+            '''
+                sample env
+                {
+                    "name" : "MYSQL_ROOT_PASSWORD",
+                    "value": "aayush"
+                }
+            '''
+            _cnt=0
+            for key in env:
+                value=env[key]
+                if _cnt == 0:
+                    self._yaml=self._yaml+[
+                        '            - '+key+': '+ value
+                    ]
+                else:
+                    self._yaml=self._yaml+[
+                        '              '+key+': '+ value
+                    ]
+                _cnt += 1
+
 
         if port is not None:
             self._yaml=self._yaml + [
@@ -93,7 +119,8 @@ class Kubernetes():
         yaml=self._yaml
         # for v in self._volumes:
         #     yaml += v
-        yaml += self._volumes
+        if len(self._volumes) > 1:
+            yaml += self._volumes
         for service in self._services:
             _tmp=["---"]
             yaml = yaml + _tmp
@@ -127,6 +154,7 @@ class Kubernetes():
         '''
         _cmd='kubectl --kubeconfig '+ self.get_kube_config_path() \
             +"kube_config_file apply -f "+ self.__file_path
+        print(_cmd)
         Log.log('cmd:'+ _cmd)
         _cmd=_cmd.split(' ')
         p = subprocess.Popen(_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -173,15 +201,16 @@ class KubernetesTransferToVolume():
         4. Delete the pod
     '''
 
-    def __init__(self, pod_name, volume_name, ssh_client):
+    def __init__(self, pod_name, volume_name, ssh_client, _env):
         self.__pod_name = pod_name + '-temp'
         self.__kubernetes = Kubernetes(name=self.__pod_name, ssh_client=ssh_client, no_replicas=1)
         self.__volume_name = volume_name
         self.ssh_client = ssh_client
+        self._env=_env
 
     def save_yaml_file(self):
 
-        self.__kubernetes.add_container(self.__pod_name, None, 'ubuntu', mount_path='/', volume_name=self.__pod_name.split('-')[0])
+        self.__kubernetes.add_container(self.__pod_name, None, 'mysql:5.6', env=self._env, mount_path='/docker-entrypoint-initdb.d', volume_name=self.__pod_name.split('-')[0])
         self.__kubernetes.add_volume(self.__pod_name.split('-')[0])
         self.__kubernetes.save_file(name='kube_temp.yaml')
 

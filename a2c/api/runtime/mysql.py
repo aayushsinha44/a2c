@@ -18,7 +18,7 @@ class MySQL(Runtime):
 
     def generate_container_file(self):
         _docker_file = [
-            "FROM mysql"
+            "FROM mysql:5.6"
         ]
         return '\n'.join(_docker_file)
 

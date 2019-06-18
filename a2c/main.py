@@ -61,7 +61,7 @@ if __name__ == '__main__':
     # main()
     password='intern1'
     username='ubuntu'
-    hostname='172.22.6.161'
+    hostname='172.22.6.162'
 
     docker_username="intaayushsinhaml"
     docker_password="aayushsinha"
@@ -118,13 +118,18 @@ if __name__ == '__main__':
             if process_tuple[2] in VOLUME_RUNTIME:
                 _runtime = runtime_exec.get_runtime(mysql_db_username=mysql_db_username,
                                                     mysql_db_password=mysql_db_password)
+                
+                _env = {
+                    "name" : "MYSQL_ROOT_PASSWORD",
+                    "value": "aayush"
+                }
 
                 _runtime.save_code()
                 _runtime.save_container_info()  
                 _runtime.build_container()
                 _runtime.push_container_docker_registry()
                 
-                kubernetes_object.add_container(_runtime.get_name(), _runtime.get_port(), _runtime.get_image(), mount_path='/')
+                kubernetes_object.add_container(_runtime.get_name(), _runtime.get_port(), _runtime.get_image(), _env,  mount_path='/var/lib/mysql')
                 kubernetes_object.add_service(_runtime.get_name(), _runtime.get_port())
                 kubernetes_object.add_volume(_runtime.get_name())
                 kubernetes_object.add_persistent_volume(_runtime.get_name())
@@ -135,7 +140,7 @@ if __name__ == '__main__':
                 # transfer files to pod
                 _pod_name=_runtime.get_name()
                 _volume_name=_runtime.get_name()
-                kubernetes_transfer_to_volume=KubernetesTransferToVolume(_pod_name, _volume_name, ssh)
+                kubernetes_transfer_to_volume=KubernetesTransferToVolume(_pod_name, _volume_name, ssh, _env)
                 kubernetes_transfer_to_volume.save_yaml_file()
                 kubernetes_transfer_to_volume.apply_temp_file()
                 # kubernetes_transfer_to_volume.copy_from_client_to_host('/home/ubuntu/db_dump.sql', 'db_dump.sql', _runtime.get_process_path())
@@ -145,12 +150,14 @@ if __name__ == '__main__':
 
             
             else:
+                
                 _runtime = runtime_exec.get_runtime()
                 _runtime.save_code()
                 _runtime.save_container_info()  
                 _runtime.build_container()
                 _runtime.push_container_docker_registry()
                 
+                print('Kubernetes started')
                 kubernetes_object.add_container(_runtime.get_name(), _runtime.get_port(), _runtime.get_image())
                 kubernetes_object.add_service(_runtime.get_name(), _runtime.get_port())
                 kubernetes_object.save_file()
