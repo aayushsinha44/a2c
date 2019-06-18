@@ -20,7 +20,7 @@ class MySQL(Runtime):
         _docker_file = [
             "FROM mysql"
         ]
-        return _docker_file
+        return '\n'.join(_docker_file)
 
     def get_code_folder_path(self):
         '''
@@ -34,7 +34,8 @@ class MySQL(Runtime):
                 }
             ]
         '''
-        return self.get_data_in_format(source='db_dump.sql', destination='db_dump.sql')
+        self.generate_dump()
+        return [self.get_data_in_format(source='db_dump.sql', destination='db_dump.sql')]
 
 
     def generate_dump(self):

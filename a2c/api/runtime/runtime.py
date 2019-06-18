@@ -22,7 +22,7 @@ class Runtime(ABC):
         _path = self.ssh_client.get_user_data_path() 
         if _path[-1] != "/":
             _path += "/" 
-        _path += self._get_process_path() + "/"
+        _path += self.get_process_path() + "/"
 
         _file = open(_path+'Dockerfile', 'w')
         _file.write(_container_file)
@@ -63,27 +63,27 @@ class Runtime(ABC):
         for p in path:
             print("------Saving code:", p)
             self.ssh_client.scp(client_path=p["source"], 
-                                process_path=self._get_process_path(),
+                                process_path=self.get_process_path(),
                                 host_path=p["destination"],
                                 is_folder=p["is_folder"],
                                 is_sudo=p["is_sudo"])
 
             # TODO: check for success
 
-    def _get_process_path(self):
+    def get_process_path(self):
         return self.process_id+self.process_name
 
     def build_container(self):
-        self.docker_client.build(self._get_process_path())
+        self.docker_client.build(self.get_process_path())
 
     def push_container_docker_registry(self):
-        self.docker_client.push(self._get_process_path())
+        self.docker_client.push(self.get_process_path())
 
     def get_port(self):
         return self.process_port
 
     def get_image(self):
-        return self.docker_client.get_username()+"/"+self._get_process_path()
+        return self.docker_client.get_username()+"/"+self.get_process_path()
 
     def get_name(self):
         return self.process_name

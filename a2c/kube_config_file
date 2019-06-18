@@ -1,0 +1,24 @@
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURDekNDQWZPZ0F3SUJBZ0lRZDAyNjg1bk1ZcFBQMnNWRnBjaUs2REFOQmdrcWhraUc5dzBCQVFzRkFEQXYKTVMwd0t3WURWUVFERXlRM01UUTBZamxsTlMxaVpEUmtMVFF3TW1JdFlXUTNZaTFqTTJKbFlqaGxNbU0xTVRFdwpIaGNOTVRrd05qRTRNRGN4TVRNMldoY05NalF3TmpFMk1EZ3hNVE0yV2pBdk1TMHdLd1lEVlFRREV5UTNNVFEwCllqbGxOUzFpWkRSa0xUUXdNbUl0WVdRM1lpMWpNMkpsWWpobE1tTTFNVEV3Z2dFaU1BMEdDU3FHU0liM0RRRUIKQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUUNvbzR2NUxlUmJ4bXJLR0tRQXRNaGhrbm1lbDdpT0FnWlpGTFZoTm5zTApYZCtJQ1FMOG85U1dWWU9mNzViWUQ0Njd3TzRKaWZjbERpcENxRm8xMHNnTWYxZlZFdHF1ME1lcU9uOWxvRHF6CjNNV0ZRTUtTdng1U0lpc2MrNjBjRFI2VGxsM0I1SjN5d2ZCbTJlY1kzVjVYdjhFVzdpZGhlRUJEaEp4aFBJMDAKdFZMMmxtK0pCaTVOd1c0U1laVEVkVS9lbE9ZVHhveDZyVG1BTXUvWHRoRS8rRjdIQUpERjVxVWU1UnlFRElvNgpTcXdIajJ6emZtbmdDOFhBMDlmZ2QzcFQyd1JHcWVQRDI3SFVoUWFHYnVETHBIdWZ4NnlKblN2Y0hLZkJRNjRqCk1TSVhhS29BcTBnZkVOcHBVMEFhbWVmSlUvZlRqdTRMZzFrdTI4Uzd5RmVkQWdNQkFBR2pJekFoTUE0R0ExVWQKRHdFQi93UUVBd0lDQkRBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUEwR0NTcUdTSWIzRFFFQkN3VUFBNElCQVFBcQpOL1dHc1g1VU9XOXFMSnBVeWFTdkVFTXlYNDU5dkZMaU9ab3dpenRmVEE0VHhLb0hTSlBXb1BvL3BkSXVsUWN6CkpXeEFteURCdFRYUEJVZmZyV0lPMHE4am43RG43ZmpPMk9EektFTEF3Z0cwdHhQeFRja3ltTHNKcWJZa25LRnQKYkFaT09WVm9YRXRuQ1BhUEJoV3B0dDh4TjlEUDRUSzFLOGw2YmsyK1UxNGdMTDMxVXNQWm5QSXF3OGFOa054MAora2xGbHdXTnVheFFiZUFYRkt0bUdlWm5iYWdvTVQzVXI5U1hvZUYrRWZzVWVMRDE3TmNYQ0tOOTRBc0lIZFFPCi9odDRxM0g3Wk1WcUFIdE94djU0T0ZaVDd1akJIQ2FlSmJmS2hYK1QwMzhidzZTZngvT3NFeVBkOVBNa1NOUnIKSVZpc0JBeUw3N1ZOMm9EN0pIZHoKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+    server: https://35.238.117.140
+  name: gke_hackathon-239907_us-central1-a_standard-cluster-1
+contexts:
+- context:
+    cluster: gke_hackathon-239907_us-central1-a_standard-cluster-1
+    user: gke_hackathon-239907_us-central1-a_standard-cluster-1
+  name: gke_hackathon-239907_us-central1-a_standard-cluster-1
+current-context: gke_hackathon-239907_us-central1-a_standard-cluster-1
+kind: Config
+preferences: {}
+users:
+- name: gke_hackathon-239907_us-central1-a_standard-cluster-1
+  user:
+    auth-provider:
+      config:
+        cmd-args: config config-helper --format=json
+        cmd-path: /google/google-cloud-sdk/bin/gcloud
+        expiry-key: '{.credential.token_expiry}'
+        token-key: '{.credential.access_token}'
+      name: gcp

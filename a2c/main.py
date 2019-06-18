@@ -1,9 +1,16 @@
 from api.ssh import SSH
-from api.runtime.constants import TOMCAT
+from api.runtime.constants import TOMCAT, VOLUME_RUNTIME
 from api.runtime.runtime_execution import RuntimeExecution
 from api.docker import Docker
+from api.kubernetes import Kubernetes, KubernetesTransferToVolume
 import os
 from xml.dom import minidom
+
+def setup():
+    if os.path.exists('file.log'):
+        os.system('rm file.log')
+    if os.path.exists('user_files/'):
+        os.system('rm -rf user_files/')
 
 def generate_sftp_build():
 
@@ -49,14 +56,19 @@ def find_tomcat_port(process_id):
 
 if __name__ == '__main__':
 
+    # setup()
+
     # main()
     password='intern1'
     username='ubuntu'
-    hostname='172.22.6.141'
+    hostname='172.22.6.161'
 
     docker_username="intaayushsinhaml"
     docker_password="aayushsinha"
     registry="https://index.docker.io/v1/"
+
+    mysql_db_username='aayush'
+    mysql_db_password='aayush'
 
     ssh = SSH(hostname=hostname, port=22, username=username, password=password, pkey=None)
 
@@ -64,28 +76,28 @@ if __name__ == '__main__':
     docker_client.login()
 
     # Kubeconfig file
-    # _kube_file = open('api/kube_config_file', 'r')
-    # _kube_file_text=_kube_file.read()
-    # _kube_file.close()
+    _kube_file = open('kube_config_file', 'r')
+    _kube_file_text=_kube_file.read()
+    _kube_file.close()
 
     BLACKLIST_PID = set()
     
-    # try:
-    _, output, error=ssh.exec_command('ps -ef | grep -c catalina')
-    if int(output) > 1:
-        _, output, error=ssh.exec_command('ps -ef | grep catalina | sed -n \'1p\' | awk \'{print $2}\'')
+    try:
+        _, output, error=ssh.exec_command('ps -ef | grep -c catalina')
+        if int(output) > 1:
+            _, output, error=ssh.exec_command('ps -ef | grep catalina | sed -n \'1p\' | awk \'{print $2}\'')
 
-        process_id = str(output.split('\n')[0])
-        process_port = find_tomcat_port(process_id)
-        runtime_exec = RuntimeExecution(process_port=process_port, 
-                                        process_id=process_id, 
-                                        process_name=TOMCAT, 
-                                        ssh_client=ssh, 
-                                        docker_client=docker_client)
-        runtime_exec.call_runtime()
-        BLACKLIST_PID.add(process_id)
-    # except Exception as e:
-    #     print(e)
+            process_id = str(output.split('\n')[0])
+            process_port = find_tomcat_port(process_id)
+            runtime_exec = RuntimeExecution(process_port=process_port, 
+                                            process_id=process_id, 
+                                            process_name=TOMCAT, 
+                                            ssh_client=ssh, 
+                                            docker_client=docker_client)
+            runtime_exec.call_runtime()
+            BLACKLIST_PID.add(process_id)
+    except Exception as e:
+        print(e)
 
     # print(ssh.get_operating_system())
 
@@ -100,7 +112,50 @@ if __name__ == '__main__':
                                         docker_client=docker_client)
         if runtime_exec.is_supported():
             print("Started:", process_tuple)
-            runtime_exec.call_runtime()
+            kubernetes_object=Kubernetes('vm1', ssh)
+            
+            print(process_tuple[2], VOLUME_RUNTIME)
+            if process_tuple[2] in VOLUME_RUNTIME:
+                _runtime = runtime_exec.get_runtime(mysql_db_username=mysql_db_username,
+                                                    mysql_db_password=mysql_db_password)
+
+                _runtime.save_code()
+                _runtime.save_container_info()  
+                _runtime.build_container()
+                _runtime.push_container_docker_registry()
+                
+                kubernetes_object.add_container(_runtime.get_name(), _runtime.get_port(), _runtime.get_image(), mount_path='/')
+                kubernetes_object.add_service(_runtime.get_name(), _runtime.get_port())
+                kubernetes_object.add_volume(_runtime.get_name())
+                kubernetes_object.add_persistent_volume(_runtime.get_name())
+                kubernetes_object.save_file()
+                print('kubernetes files saved')
+                kubernetes_object.kubectl_apply()
+
+                # transfer files to pod
+                _pod_name=_runtime.get_name()
+                _volume_name=_runtime.get_name()
+                kubernetes_transfer_to_volume=KubernetesTransferToVolume(_pod_name, _volume_name, ssh)
+                kubernetes_transfer_to_volume.save_yaml_file()
+                kubernetes_transfer_to_volume.apply_temp_file()
+                # kubernetes_transfer_to_volume.copy_from_client_to_host('/home/ubuntu/db_dump.sql', 'db_dump.sql', _runtime.get_process_path())
+                _path=ssh.get_user_data_path(partial=True) + '/' + _runtime.get_process_path() + '/' + 'db_dump.sql'
+                kubernetes_transfer_to_volume.copy_data_to_volume(_path, '/docker-entrypoint-initdb.d/db_dump.sql')
+                # kubernetes_transfer_to_volume.delete_pod()
+
+            
+            else:
+                _runtime = runtime_exec.get_runtime()
+                _runtime.save_code()
+                _runtime.save_container_info()  
+                _runtime.build_container()
+                _runtime.push_container_docker_registry()
+                
+                kubernetes_object.add_container(_runtime.get_name(), _runtime.get_port(), _runtime.get_image())
+                kubernetes_object.add_service(_runtime.get_name(), _runtime.get_port())
+                kubernetes_object.save_file()
+                kubernetes_object.kubectl_apply()
+
 
     # save kube config file
     # _path = ssh.get_user_data_path()+"/"

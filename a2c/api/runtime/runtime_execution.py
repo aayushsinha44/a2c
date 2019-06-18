@@ -27,7 +27,6 @@ class RuntimeExecution():
     def get_runtime(self, mysql_db_username=None, mysql_db_password=None):
 
         if self.is_supported():
-
             if self.process_name == NGINX:
                 _runtime = Nginx(self.process_id, 
                                 self.ssh_client, 
@@ -50,6 +49,8 @@ class RuntimeExecution():
                                 self.docker_client,
                                 mysql_db_username,
                                 mysql_db_password)
+            else:
+                _runtime=None
             return _runtime
 
 

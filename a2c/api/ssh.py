@@ -83,25 +83,26 @@ class SSH:
             return error
 
 
-    def scp(self, client_path, process_path, host_path, is_folder=False, is_sudo=False):
+    def scp(self, client_path, process_path, host_path, is_folder=False, is_sudo=False, is_relative=False):
         '''
             Moves files to local system
             client_path: Path of the folder which has to be moved to host_path
         '''
 
         _client_path=client_path
-        if is_folder==False:
+        if is_folder==False and is_relative==False:
             _client_path = '/'.join(_client_path.split('/')[:-1])
 
-        _, output, _ = self.exec_command("find "+_client_path+" -type d")
-        output=output.split("\n")
+        if is_relative==False:
+            _, output, _ = self.exec_command("find "+_client_path+" -type d")
+            output=output.split("\n")
         
-        # Creating folder
-        for line in output:
-            _directory=os.path.abspath('user_files/'+self.username+"_"+self.hostname+"/"+process_path+"/"+line[1:])
-            if not os.path.exists(_directory):
-                os.makedirs(_directory)
-                Log.log("Creating directory "+ _directory, level="debug")
+            # Creating folder
+            for line in output:
+                _directory=os.path.abspath('user_files/'+self.username+"_"+self.hostname+"/"+process_path+"/"+line[1:])
+                if not os.path.exists(_directory):
+                    os.makedirs(_directory)
+                    Log.log("Creating directory "+ _directory, level="debug")
 
         if is_folder:
 
@@ -116,14 +117,16 @@ class SSH:
                 if line[0]!='/':
                     _localpath += '/'
                 self.get_file(line, _localpath+line)
-                Log.log("Transferring folder from "+line+" to "+_localpath+line, level="debug")
+                Log.log("Transferring folder-file from "+line+" to "+_localpath+line, level="debug")
 
         else:
             _localpath=self.get_user_data_path()+'/'+process_path
             print("File ", client_path)
             print("path: ", _localpath+client_path)
+            if host_path[0] != '/':
+                host_path='/'+host_path
             self.get_file(client_path, _localpath+host_path)
-            Log.log("Transferring file from "+line+" to "+_localpath+host_path, level="debug")
+            Log.log("Transferring file from "+_client_path+" to "+_localpath+host_path, level="debug")
 
         # TODO check success of file transfer
 
