@@ -61,7 +61,7 @@ if __name__ == '__main__':
     # main()
     password='intern1'
     username='ubuntu'
-    hostname='172.22.6.162'
+    hostname='172.22.6.161'
 
     docker_username="intaayushsinhaml"
     docker_password="aayushsinha"
@@ -137,16 +137,16 @@ if __name__ == '__main__':
                 print('kubernetes files saved')
                 kubernetes_object.kubectl_apply()
 
-                # transfer files to pod
-                _pod_name=_runtime.get_name()
-                _volume_name=_runtime.get_name()
-                kubernetes_transfer_to_volume=KubernetesTransferToVolume(_pod_name, _volume_name, ssh, _env)
-                kubernetes_transfer_to_volume.save_yaml_file()
-                kubernetes_transfer_to_volume.apply_temp_file()
-                # kubernetes_transfer_to_volume.copy_from_client_to_host('/home/ubuntu/db_dump.sql', 'db_dump.sql', _runtime.get_process_path())
-                _path=ssh.get_user_data_path(partial=True) + '/' + _runtime.get_process_path() + '/' + 'db_dump.sql'
-                kubernetes_transfer_to_volume.copy_data_to_volume(_path, '/docker-entrypoint-initdb.d/db_dump.sql')
-                # kubernetes_transfer_to_volume.delete_pod()
+                # # transfer files to pod
+                # _pod_name=_runtime.get_name()
+                # _volume_name=_runtime.get_name()
+                # kubernetes_transfer_to_volume=KubernetesTransferToVolume(_pod_name, _volume_name, ssh, _env)
+                # kubernetes_transfer_to_volume.save_yaml_file()
+                # kubernetes_transfer_to_volume.apply_temp_file()
+                # # kubernetes_transfer_to_volume.copy_from_client_to_host('/home/ubuntu/db_dump.sql', 'db_dump.sql', _runtime.get_process_path())
+                # _path=ssh.get_user_data_path(partial=True) + _runtime.get_process_path() + '/' + 'db_dump.sql'
+                # kubernetes_transfer_to_volume.copy_data_to_volume(_path, '/docker-entrypoint-initdb.d/db_dump.sql')
+                # # kubernetes_transfer_to_volume.delete_pod()
 
             
             else:

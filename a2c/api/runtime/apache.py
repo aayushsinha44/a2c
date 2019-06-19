@@ -16,8 +16,8 @@ class Apache(Runtime):
 
         _docker_file = [
             "FROM ubuntu:18.04",
-            "RUN apt-get update \",
-            "    apt-get install apache2",
+            "RUN apt-get update ",
+            "RUN apt-get install apache2",
         ]
 
         #Copy the required files by reading the apache2 conf file
@@ -66,10 +66,10 @@ class Apache(Runtime):
 
 
     def _search_for_files_to_copy(self):
-        _cmd = "cat " + _conf_file_location
+        _cmd = "cat " + self._conf_file_location
         _, output, _ = self.ssh_client.exec_command(_cmd)
 
-        _conf_file_content = remove_coments_and_emptylines(output)
+        _conf_file_content = self.remove_coments_and_emptylines(output)
 
     def remove_coments_and_emptylines(self, content):
         content = str(content)
@@ -79,8 +79,8 @@ class Apache(Runtime):
 
         for line in ret_val.split('\n'):
             if re.match(r'^\s*$', line):
-		        continue
-	        content += line +'\n'
+                continue
+            content += line +'\n'
         
         return content
 

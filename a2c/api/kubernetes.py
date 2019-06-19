@@ -116,7 +116,11 @@ class Kubernetes():
         self._persistent_volumes.append(_pt)
 
     def get_yaml_file(self):
-        yaml=self._yaml
+        yaml=[]
+        for pt in self._persistent_volumes:
+            yaml = yaml + pt
+        yaml=yaml+['---']
+        yaml=yaml+self._yaml
         # for v in self._volumes:
         #     yaml += v
         if len(self._volumes) > 1:
@@ -125,10 +129,6 @@ class Kubernetes():
             _tmp=["---"]
             yaml = yaml + _tmp
             yaml = yaml + service
-        for pt in self._persistent_volumes:
-            _tmp=['---']
-            yaml = yaml + _tmp
-            yaml = yaml + pt
         return '\n'.join(yaml)
 
     def save_file(self, name='kube.yaml'):
@@ -228,7 +228,8 @@ class KubernetesTransferToVolume():
     def copy_data_to_volume(self, source, destination):
 
         _cmd = 'kubectl --kubeconfig ' \
-            +"kube_config_file cp "+source+' '+self.__pod_name+':'+destination
+            +"kube_config_file cp "+source+' default/'+self.__pod_name+':'+destination
+        print(_cmd)
         Log.log('cmd:'+ _cmd)
         _cmd=_cmd.split(' ')
         p = subprocess.Popen(_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
