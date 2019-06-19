@@ -83,11 +83,6 @@ class Tomcat(Runtime):
         self._conf_files.append(self.get_data_in_format(source=_address+'tomat-users.xml', destination=_address+'tomcat-users.xml', is_folder=False))
         self._files.append(self.get_data_in_format(source=_address+'tomcat-users.xml', destination=_address+'tomcat-users.xml', is_folder=False))
 
-        
-        
-
-
-
     def tomcat_version(self):
         '''
             This funtion sets the tomcat version variable:
