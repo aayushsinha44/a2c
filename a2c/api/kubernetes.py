@@ -1,6 +1,7 @@
 import os
 from log import Log
 import subprocess
+import time
 
 class Kubernetes():
 
@@ -72,6 +73,8 @@ class Kubernetes():
                 "          volumeMounts:",
                 "            - name: "+volume_name+"-persistent-storage",
                 "              mountPath: "+mount_path,
+                "          args:",
+                '            - "--ignore-db-dir=lost+found"'
             ]
 
     def add_volume(self, name):
@@ -188,6 +191,83 @@ class Kubernetes():
                 Log.log('output:'+str(out.decode()))
             if err is not None:
                 Log.log('error:'+ str(err.decode()))
+
+    def kubectl_restart_pod(self, pod_name):
+
+        _cmd='kubectl --kubeconfig kube_config_file delete pod ' + pod_name
+        Log.log('cmd:'+ _cmd)
+        _cmd=_cmd.split(' ')
+        p = subprocess.Popen(_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, err = p.communicate()
+        if out is not None:
+            Log.log('output:'+str(out.decode()))
+        if err is not None:
+            Log.log('error:'+ str(err.decode()))
+
+    def get_pod_name(self):
+
+        _cmd='kubectl --kubeconfig kube_config_file get pods'
+        Log.log('cmd:'+ _cmd)
+        _cmd=_cmd.split(' ')
+        i=0
+        while i < 100:
+            time.sleep(1)
+            i+=1
+            p = subprocess.Popen(_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            output, err = p.communicate()
+            output = str(output.decode())
+            try:
+                for out in output.split('\n'):
+                    if self.name in out.split(' ')[0]: 
+                        Log.log(out)
+                        out=str(out)
+                        print(out)
+                        if out.split(' ')[3].split('/')[0] != '0' and \
+                            out.split(' ')[8] == 'Running':
+                            return out.split(' ')[0]
+                        break
+            except:
+                print("out:",output)
+                print("err:", err)
+        return None
+
+    def transfer_file_to_pod(self, source, destination, pod_name):
+        _cmd = 'kubectl --kubeconfig ' \
+            +"kube_config_file cp "+source+' '+pod_name+':'+destination
+        Log.log('cmd:'+ _cmd)
+        _cmd=_cmd.split(' ')
+        p = subprocess.Popen(_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, err = p.communicate()
+        if out is not None:
+            Log.log('output:'+str(out.decode()))
+        if err is not None:
+            Log.log('error:'+ str(err.decode()))
+
+        _cmd = 'kubectl --kubeconfig ' \
+            +"kube_config_file exec -it"+' '+pod_name+' -- bash -c '+ \
+                '"mysql -u root -paayush < /tmp/db_dump.sql"'
+        Log.log('cmd:'+ _cmd)
+        os.system(_cmd)
+        _cmd=_cmd.split(' ')
+        p = subprocess.Popen(_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, err = p.communicate()
+        if out is not None:
+            Log.log('output:'+str(out.decode()))
+        if err is not None:
+            Log.log('error:'+ str(err.decode()))
+
+        _cmd = 'kubectl --kubeconfig ' \
+            +"kube_config_file exec -it"+' '+pod_name+' -- bash -c '+ \
+                '"rm /tmp/db_dump.sql"'
+        Log.log('cmd:'+ _cmd)
+        _cmd=_cmd.split(' ')
+        p = subprocess.Popen(_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, err = p.communicate()
+        if out is not None:
+            Log.log('output:'+str(out.decode()))
+        if err is not None:
+            Log.log('error:'+ str(err.decode()))
+
             
 
 

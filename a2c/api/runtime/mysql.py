@@ -18,7 +18,7 @@ class MySQL(Runtime):
 
     def generate_container_file(self):
         _docker_file = [
-            "FROM mysql:5.6"
+            "FROM mysql:5.7.26"
         ]
         return '\n'.join(_docker_file)
 
@@ -41,5 +41,7 @@ class MySQL(Runtime):
     def generate_dump(self):
         _cmd=' mysqldump -u'+ self.__mysql_db_username + \
              ' -p'+self.__mysql_db_password + \
-                 ' --events --routines --triggers --all-databases > db_dump.sql'
+                      ' --all-databases > db_dump.sql'
+                    
+                #  ' --events --routines --triggers' + \
         self.ssh_client.exec_command(_cmd)

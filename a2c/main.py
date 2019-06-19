@@ -136,6 +136,20 @@ if __name__ == '__main__':
                 kubernetes_object.save_file()
                 print('kubernetes files saved')
                 kubernetes_object.kubectl_apply()
+                
+                _pod_name = kubernetes_object.get_pod_name()
+                _pod_name = _pod_name.strip()
+
+                _source=ssh.get_user_data_path(partial=True) + _runtime.get_process_path() + '/' + 'db_dump.sql'
+                _destination='/tmp/db_dump.sql'
+                kubernetes_object.transfer_file_to_pod(_source, _destination, _pod_name)
+                kubernetes_object.kubectl_restart_pod(_pod_name)
+                
+                # _pod_name = kubernetes_object.get_pod_name()
+                # _pod_name = _pod_name.strip()
+
+                # kubernetes_object.delete_data(_pod_name)
+                # kubernetes_object.kubectl_restart_pod(_pod_name)
 
                 # # transfer files to pod
                 # _pod_name=_runtime.get_name()

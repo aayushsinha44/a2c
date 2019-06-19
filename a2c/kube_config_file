@@ -5,8 +5,8 @@ clusters:
     server: https://34.67.161.174
   name: gke_hackathon-239907_us-central1-a_high-cpu-cluster-1
 - cluster:
-    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURDekNDQWZPZ0F3SUJBZ0lRZDAyNjg1bk1ZcFBQMnNWRnBjaUs2REFOQmdrcWhraUc5dzBCQVFzRkFEQXYKTVMwd0t3WURWUVFERXlRM01UUTBZamxsTlMxaVpEUmtMVFF3TW1JdFlXUTNZaTFqTTJKbFlqaGxNbU0xTVRFdwpIaGNOTVRrd05qRTRNRGN4TVRNMldoY05NalF3TmpFMk1EZ3hNVE0yV2pBdk1TMHdLd1lEVlFRREV5UTNNVFEwCllqbGxOUzFpWkRSa0xUUXdNbUl0WVdRM1lpMWpNMkpsWWpobE1tTTFNVEV3Z2dFaU1BMEdDU3FHU0liM0RRRUIKQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUUNvbzR2NUxlUmJ4bXJLR0tRQXRNaGhrbm1lbDdpT0FnWlpGTFZoTm5zTApYZCtJQ1FMOG85U1dWWU9mNzViWUQ0Njd3TzRKaWZjbERpcENxRm8xMHNnTWYxZlZFdHF1ME1lcU9uOWxvRHF6CjNNV0ZRTUtTdng1U0lpc2MrNjBjRFI2VGxsM0I1SjN5d2ZCbTJlY1kzVjVYdjhFVzdpZGhlRUJEaEp4aFBJMDAKdFZMMmxtK0pCaTVOd1c0U1laVEVkVS9lbE9ZVHhveDZyVG1BTXUvWHRoRS8rRjdIQUpERjVxVWU1UnlFRElvNgpTcXdIajJ6emZtbmdDOFhBMDlmZ2QzcFQyd1JHcWVQRDI3SFVoUWFHYnVETHBIdWZ4NnlKblN2Y0hLZkJRNjRqCk1TSVhhS29BcTBnZkVOcHBVMEFhbWVmSlUvZlRqdTRMZzFrdTI4Uzd5RmVkQWdNQkFBR2pJekFoTUE0R0ExVWQKRHdFQi93UUVBd0lDQkRBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUEwR0NTcUdTSWIzRFFFQkN3VUFBNElCQVFBcQpOL1dHc1g1VU9XOXFMSnBVeWFTdkVFTXlYNDU5dkZMaU9ab3dpenRmVEE0VHhLb0hTSlBXb1BvL3BkSXVsUWN6CkpXeEFteURCdFRYUEJVZmZyV0lPMHE4am43RG43ZmpPMk9EektFTEF3Z0cwdHhQeFRja3ltTHNKcWJZa25LRnQKYkFaT09WVm9YRXRuQ1BhUEJoV3B0dDh4TjlEUDRUSzFLOGw2YmsyK1UxNGdMTDMxVXNQWm5QSXF3OGFOa054MAora2xGbHdXTnVheFFiZUFYRkt0bUdlWm5iYWdvTVQzVXI5U1hvZUYrRWZzVWVMRDE3TmNYQ0tOOTRBc0lIZFFPCi9odDRxM0g3Wk1WcUFIdE94djU0T0ZaVDd1akJIQ2FlSmJmS2hYK1QwMzhidzZTZngvT3NFeVBkOVBNa1NOUnIKSVZpc0JBeUw3N1ZOMm9EN0pIZHoKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
-    server: https://35.238.117.140
+    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURDekNDQWZPZ0F3SUJBZ0lRSEdUd2pQM3lWRlZYKzFPNWlaNm51VEFOQmdrcWhraUc5dzBCQVFzRkFEQXYKTVMwd0t3WURWUVFERXlRM09ETmhZekppWkMxaU5XWXhMVFExWmpJdFlqSXdZUzFtWmpZNU1tTTFNV1UxWXpndwpIaGNOTVRrd05qRTVNRFEwTURFMFdoY05NalF3TmpFM01EVTBNREUwV2pBdk1TMHdLd1lEVlFRREV5UTNPRE5oCll6SmlaQzFpTldZeExUUTFaakl0WWpJd1lTMW1aalk1TW1NMU1XVTFZemd3Z2dFaU1BMEdDU3FHU0liM0RRRUIKQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUURBdnVyVTRwVlpwUDNXZTF1SVFSdUZSM3k1SHROcFJJV2ZWTDdvYlBLSAprT0kzSHR3STkwZGxkOURIcEtQaTdNQ0lvekgveGJubGVCaGNiMFdiRVpOS0t0V2ZlSUNVM1hqR1dZM0kvbmVqCnF0WHB1NUhvNVB0eFdQQ3RyRDM1R0pkRGR6NzFVUHBFRUhJMWJjZlMvanVYV2Vzc0JLbU11U3JFb2hmaW9Jd2kKZTBsRzhHeWl6azdiNGsvakM4eUp5Zno5Q3N5WlZOeFByZmcremZyVGdmL09BejBmMlpJSGYvQ21EYllUK091eQo0YkpiWUIva0Z5aFRDdVczRkNsTWVBWUY2bWh4MklwRjN6aTlBQ2xkbWw3anBGS3p6QTMrU3lpK2lGazZXNmRRCityY2hoTnlBK2FleEhrZjRDTHorM0VWZ1NQMnZDR2pDOXBXNUpUOTczUzd2QWdNQkFBR2pJekFoTUE0R0ExVWQKRHdFQi93UUVBd0lDQkRBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUEwR0NTcUdTSWIzRFFFQkN3VUFBNElCQVFCaAo0cVllSEI2Z0tuZm5ia3ZXdXQ2Q1RsVTI1aEtmcXdSb2laaTlpeHRmR0tLZzZIMkJRUnczZ3RwTHgvVVliSUJSClNSZ0YxMXBBNnFEeno4cTVxZW1aZVRwbW80NDREWkZpcVd3V21lRHR1L3lWb0o5SSt6NXdQclVNOWtOc0ZadzUKdm9MYkVPVDF6NHJWSTZiZ3RWRWxFS0NCZ0V5QVl5RXkxeVFHKzVxTUozSktuNXBsQ09UdlJmYmR0cCtUZnpaTApxVlRzc2lwbHRNT01DVXlucXhGVTlEUXVscFlKNFJJNmMxV2JXc2VQV3hkVE5US0dFbnA5WWE5Nm1rWTBsQXE2CjJVNGMrbFdNd0pjVkRjSFBsVkNFVmtsZndWNGlLUEVjQnJiMkhlbER1L3dBZVB6MmlNb0dkV0N0SE44N1ZhVlkKOU5GZnc2WWQzSDZCaEVJQ1ZjZ2UKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+    server: https://35.194.43.152
   name: gke_hackathon-239907_us-central1-a_standard-cluster-1
 contexts:
 - context:
@@ -17,7 +17,7 @@ contexts:
     cluster: gke_hackathon-239907_us-central1-a_standard-cluster-1
     user: gke_hackathon-239907_us-central1-a_standard-cluster-1
   name: gke_hackathon-239907_us-central1-a_standard-cluster-1
-current-context: gke_hackathon-239907_us-central1-a_high-cpu-cluster-1
+current-context: gke_hackathon-239907_us-central1-a_standard-cluster-1
 kind: Config
 preferences: {}
 users:
@@ -25,10 +25,10 @@ users:
   user:
     auth-provider:
       config:
-        access-token: ya29.GqUBLAfK5W0yZHwerVA2lVtQInh3rynRX35iIQffb627hyTDMpaKhqdbV-iJgydmiJeS21FSEAX1L-hUQD6JNFp_xKkJUh32DmsZExlHutJJWg_7AA1OsmBvaxPpHInYnGx0892iKFAF7M7JRLIvS59Xj67Ymlx4D6GYZu9amC8Z6ttmImxVw-gR2f_xPYVg72uP5ktEXilWwFo6V48dd9IJizq2ooGg
+        access-token: ya29.GqUBLAfomN375hFXy_BVBDB0593ikMDUceexxJD7xrhQuULcCr_ZwfDk9NvVbOm77zy4iR8sao4_Vqxpb_31gZB9JLwgmStlfWhFaK5DydaiPdTVeGzvaHoZhNvOrflfMH0tkU9vzF8wWcYBu-VgyU6dQJUTIvYn994nV4FlNkuSlDXN8JN0k2vQADipt7kcn16SnkxW_ZbV7-0TorZew6DY91Yu_sPq
         cmd-args: config config-helper --format=json
         cmd-path: /google/google-cloud-sdk/bin/gcloud
-        expiry: 2019-06-19T04:55:22Z
+        expiry: 2019-06-19 05:55:21
         expiry-key: '{.credential.token_expiry}'
         token-key: '{.credential.access_token}'
       name: gcp
@@ -36,10 +36,10 @@ users:
   user:
     auth-provider:
       config:
-        access-token: ya29.GqUBKwf1-yFbQHLkXNYRJRiJTbEJ6aZ9Jo4PmStPP0bslaEcbzPSXDetV1Km8JSPG8_E6jEJfx8kSHWZqujRgMS_dSq2jvmLD1Yr9jF0kXezP-fvmc1pyNuHZE5-TclVGGq-B9EqFZWjowXRScpsJ0j-x-6mfkiVv6OSzbUKIJUG3R9AeTv1b1B2lrzX60hEVMJ-9cxwy91Hu4xMhWDtc4vmmyI9dOrE
+        access-token: ya29.GqUBLAddzDN00dbSYdjqmvpoDjIjPw8NYxMxR7Q9fQy3wEt3TT8Yp5EpaSa68GA0JnVFUjM2Wp_FwT1NRBD6rwTq288vFqbL2hBN1X3AAvxuF_XB6d3CeRkdZGlznxtZRJ1AOMvCz8WbTngbsuBew-bh7Anz1Ow6wgBV7xp_83LwurwN3OnoE7asav4iatfmIFAeyANeF2tHz9OkP56L1vaMQR9mafUL
         cmd-args: config config-helper --format=json
         cmd-path: /google/google-cloud-sdk/bin/gcloud
-        expiry: 2019-06-18 13:20:21
+        expiry: 2019-06-19T13:47:31Z
         expiry-key: '{.credential.token_expiry}'
         token-key: '{.credential.access_token}'
       name: gcp
