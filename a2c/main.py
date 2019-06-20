@@ -86,9 +86,10 @@ if __name__ == '__main__':
         _, output, error=ssh.exec_command('ps -ef | grep -c catalina')
         if int(output) > 1:
             _, output, error=ssh.exec_command('ps -ef | grep catalina | sed -n \'1p\' | awk \'{print $2}\'')
-
+            
             process_id = str(output.split('\n')[0])
             process_port = find_tomcat_port(process_id)
+            print("Found: Tomcat")
             runtime_exec = RuntimeExecution(process_port=process_port, 
                                             process_id=process_id, 
                                             process_name=TOMCAT, 
@@ -133,8 +134,8 @@ if __name__ == '__main__':
                 kubernetes_object.add_volume(_runtime.get_name())
                 kubernetes_object.add_persistent_volume(_runtime.get_name())
                 kubernetes_object.save_file()
-                print('kubernetes files saved')
                 kubernetes_object.kubectl_apply()
+                
                 
                 _pod_name = kubernetes_object.get_pod_name()
                 _pod_name = _pod_name.strip()
@@ -154,8 +155,8 @@ if __name__ == '__main__':
                 _runtime.build_container()
                 _runtime.push_container_docker_registry()
                 
-                print('Kubernetes started')
                 kubernetes_object.add_container(_runtime.get_name(), _runtime.get_port(), _runtime.get_image())
                 kubernetes_object.add_service(_runtime.get_name(), _runtime.get_port())
                 kubernetes_object.save_file()
                 kubernetes_object.kubectl_apply()
+                print('deployed to kubernetes')

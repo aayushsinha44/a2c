@@ -61,7 +61,7 @@ class Runtime(ABC):
         path=self.get_code_folder_path()
         # print(path, '==========================')
         for p in path:
-            print("------Saving code:", p)
+            print("Moving data:", p)
             self.ssh_client.scp(client_path=p["source"], 
                                 process_path=self.get_process_path(),
                                 host_path=p["destination"],
