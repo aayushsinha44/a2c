@@ -113,8 +113,7 @@ if __name__ == '__main__':
         if runtime_exec.is_supported():
             print("Started:", process_tuple)
             kubernetes_object=Kubernetes('vm1', ssh)
-            
-            print(process_tuple[2], VOLUME_RUNTIME)
+
             if process_tuple[2] in VOLUME_RUNTIME:
                 _runtime = runtime_exec.get_runtime(mysql_db_username=mysql_db_username,
                                                     mysql_db_password=mysql_db_password)
@@ -142,25 +141,9 @@ if __name__ == '__main__':
 
                 _source=ssh.get_user_data_path(partial=True) + _runtime.get_process_path() + '/' + 'db_dump.sql'
                 _destination='/tmp/db_dump.sql'
-                kubernetes_object.transfer_file_to_pod(_source, _destination, _pod_name)
+                _db_password=_env['value']
+                kubernetes_object.transfer_file_to_pod(_source, _destination, _pod_name, _db_password)
                 kubernetes_object.kubectl_restart_pod(_pod_name)
-                
-                # _pod_name = kubernetes_object.get_pod_name()
-                # _pod_name = _pod_name.strip()
-
-                # kubernetes_object.delete_data(_pod_name)
-                # kubernetes_object.kubectl_restart_pod(_pod_name)
-
-                # # transfer files to pod
-                # _pod_name=_runtime.get_name()
-                # _volume_name=_runtime.get_name()
-                # kubernetes_transfer_to_volume=KubernetesTransferToVolume(_pod_name, _volume_name, ssh, _env)
-                # kubernetes_transfer_to_volume.save_yaml_file()
-                # kubernetes_transfer_to_volume.apply_temp_file()
-                # # kubernetes_transfer_to_volume.copy_from_client_to_host('/home/ubuntu/db_dump.sql', 'db_dump.sql', _runtime.get_process_path())
-                # _path=ssh.get_user_data_path(partial=True) + _runtime.get_process_path() + '/' + 'db_dump.sql'
-                # kubernetes_transfer_to_volume.copy_data_to_volume(_path, '/docker-entrypoint-initdb.d/db_dump.sql')
-                # # kubernetes_transfer_to_volume.delete_pod()
 
             
             else:
@@ -176,26 +159,3 @@ if __name__ == '__main__':
                 kubernetes_object.add_service(_runtime.get_name(), _runtime.get_port())
                 kubernetes_object.save_file()
                 kubernetes_object.kubectl_apply()
-
-
-    # save kube config file
-    # _path = ssh.get_user_data_path()+"/"
-    # if os.path.exists(_path+"kube_config_file"):
-    #     _kube_file = open(_path+"kube_config_file", 'w')
-    # else:
-    #     _kube_file = open(_path+"kube_config_file", 'x')
-    # _kube_file.write(_kube_file_text)
-    # _kube_file.close()
-
-    # Create kubernetes deployment
-    # kubectl --kubeconfig /home/ubuntu/a2c/api/kube_config_file get nodes
-
-    # _path_partial=ssh.get_user_data_path(partial=True)+"/"
-    # _path_partial+= 'kubernetes/'
-    # for root, dirs, files in os.walk(_path_partial):
-    #     path=root.split(os.sep)
-    #     for file in files:
-    #         _localpath = os.path.abspath(root+os.sep+file)
-    #         print("kubernetes command:", 'kubectl --kubeconfig '+ _path+"kube_config_file create -f "+ _localpath)
-            # os.system('kubectl --kubeconfig '+ _path+"kube_config_file create -f "+ _localpath)
-        

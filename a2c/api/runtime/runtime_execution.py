@@ -49,6 +49,14 @@ class RuntimeExecution():
                                 self.docker_client,
                                 mysql_db_username,
                                 mysql_db_password)
+
+            elif self.process_name == APACHE:
+                _runtime = Apache(self.process_id, 
+                                self.ssh_client, 
+                                self.process_name, 
+                                self.process_port, 
+                                self.docker_client)
+            
             else:
                 _runtime=None
             return _runtime
@@ -81,6 +89,13 @@ class RuntimeExecution():
                                 self.docker_client,
                                 mysql_db_username,
                                 mysql_db_password)
+            
+            elif self.process_name == APACHE:
+                _runtime = Apache(self.process_id, 
+                                self.ssh_client, 
+                                self.process_name, 
+                                self.process_port, 
+                                self.docker_client)
 
             _runtime.save_code()
             _runtime.save_container_info()  

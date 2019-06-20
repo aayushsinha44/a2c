@@ -231,7 +231,7 @@ class Kubernetes():
                 print("err:", err)
         return None
 
-    def transfer_file_to_pod(self, source, destination, pod_name):
+    def transfer_file_to_pod(self, source, destination, pod_name, db_password):
         _cmd = 'kubectl --kubeconfig ' \
             +"kube_config_file cp "+source+' '+pod_name+':'+destination
         Log.log('cmd:'+ _cmd)
@@ -245,7 +245,7 @@ class Kubernetes():
 
         _cmd = 'kubectl --kubeconfig ' \
             +"kube_config_file exec -it"+' '+pod_name+' -- bash -c '+ \
-                '"mysql -u root -paayush < /tmp/db_dump.sql"'
+                '"mysql -u root -p'+db_password+' < /tmp/db_dump.sql"'
         Log.log('cmd:'+ _cmd)
         os.system(_cmd)
         _cmd=_cmd.split(' ')
