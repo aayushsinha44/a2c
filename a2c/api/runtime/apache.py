@@ -22,7 +22,7 @@ class Apache(Runtime):
         ]
 
         #Copy the required files by reading the apache2 conf file
-        for file in _files:
+        for file in self._files:
             _docker_file.append("COPY "+ self.build_path(file["destination"]) + " " + file["source"])
 
 
@@ -85,12 +85,12 @@ class Apache(Runtime):
             -D SERVER_CONFIG_FILE="apache2.conf"
         '''
         _cmd = 'apache2 -V | grep HTTPD_ROOT | awk -F \'=\"\' \'{print $2}\''
-        _, output, error = self.ssh_client.exec_command(_cmd)
+        _, output, _ = self.ssh_client.exec_command(_cmd)
 
         self._HTTPD_ROOT = output[:-1]
 
         _cmd = 'apache2 -V | grep SERVER_CONFIG_FILE | awk -F \'=\"\' \'{print $2}\''
-        _, output, error = self.ssh_client.exec_command(_cmd)
+        _, output, _ = self.ssh_client.exec_command(_cmd)
 
         self._SERVER_CONFIG_FILE = output[:-1]
 
