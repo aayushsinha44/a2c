@@ -36,9 +36,12 @@ Endpoints:
 /push_container_docker_registry
 
 /initialize_kubernetes
-/save_container_in_kubernetes_file
-/save_kubernetes_file
-/apply_kubernetes_file
+/kubernetes/add_container
+/kubernetes/add_service
+/kubernetes/add_volume
+/kubernetes/transfer_data_to_volume
+/kubernetes/save
+/kubernetes/apply
 
 /get_docker_file/<process_id>/<process_name>
 /get_kubernetes_file
@@ -61,6 +64,7 @@ docker_client=None
 kubernetes_object=None
 RUNTIME=None
 PROCESS_LIST=[]
+_env=None
 
 
 def build_response(msg, code=200, success=True):
@@ -222,6 +226,8 @@ def login_vm(username, hostname):
 @app.route("/get_os_info")
 def get_os_info():
     global ssh
+    if ssh is None:
+        return build_response({"message": "login into vm first"}, code=400, success=False)
     try:
         return build_response({"data": ssh.get_operating_system()})
     except Exception as e:
@@ -229,7 +235,9 @@ def get_os_info():
         
 @app.route("/discover_process")
 def discover_process():
-    global PROCESS_LIST
+    global PROCESS_LIST, ssh
+    if ssh is None:
+        return build_response({"message": "login into vm first"}, code=400, success=False)
     PROCESS_LIST=[]
     process_port_info = ssh.get_activate_process_on_port()
     for process_tuple in process_port_info:
@@ -244,7 +252,8 @@ def discover_process():
 def start_containerization(process_port, process_id, process_name):
     global ssh, docker_client, RUNTIME, PROCESS_LIST
 
-    print(process_port, process_name, process_id, PROCESS_LIST)
+    if ssh is None:
+        return build_response({"message": "login into vm first"}, code=400, success=False)
 
     if not is_process_in_process_list(process_port, process_id, process_name):
         return build_response({"message": "invalid data"}, code=400, success=False)
@@ -312,64 +321,111 @@ def push_container_docker_registry():
     except Exception as e:
         return build_response({"message": str(e)}, code=500, success=False)
 
-# @app.route("/initialize_kubernetes/<name>/<no_replica>")
-# def initialize_kubernetes_file(name, no_replica):
-#     try:
-#         global kubernetes_object
-#         kubernetes_object=Kubernetes(name, no_replica)
-#         return build_response({"message": ""})
-#     except Exception as e:
-#         return build_response({"message": str(e)}, code=500, success=False)
+@app.route("/initialize_kubernetes/<name>/<no_replica>")
+def initialize_kubernetes_file(name, no_replica):
+    try:
+        global kubernetes_object, ssh
+        if ssh is None:
+            return build_response({"message": "login into vm first"}, code=400, success=False)
+        kubernetes_object=Kubernetes(name, no_replica, ssh)
+        return build_response({"message": ""})
+    except Exception as e:
+        return build_response({"message": str(e)}, code=500, success=False)
+
+@app.route("/kubernetes/add_container")
+def kubernetes_add_container():
+    try:
+        global kubernetes_object, RUNTIME, _env
+        if RUNTIME is None:
+            return build_response({"message": "containerization has not been started"}, code=400, success=False)
+        if kubernetes_object is None:
+            return build_response({"message": "initailize kubernetes first"}, code=400, success=False)
+        _json=request.json
+        _env=_json
+        if "name" in _json and "value" in _json:
+            kubernetes_object.add_container(RUNTIME.get_name(), RUNTIME.get_port(), RUNTIME.get_image(), _json,  mount_path='/var/lib/mysql')
+        else:
+            kubernetes_object.add_container(RUNTIME.get_name(), RUNTIME.get_port(), RUNTIME.get_image())
+            kubernetes_object.add_service(RUNTIME.get_name(), RUNTIME.get_port())
+        return build_response({"message": "container added"})
+    except Exception as e:
+        return build_response({"message": str(e)}, code=500, success=False)
+
+@app.route("/kubernetes/add_service")
+def kubernetes_add_service():
+    try:
+        global kubernetes_object, RUNTIME
+        if RUNTIME is None:
+            return build_response({"message": "containerization has not been started"}, code=400, success=False)
+        if kubernetes_object is None:
+            return build_response({"message": "initailize kubernetes first"}, code=400, success=False)
+        
+        kubernetes_object.add_service(RUNTIME.get_name(), RUNTIME.get_port())
+        return build_response({"message": "service added"})
+    except Exception as e:
+        return build_response({"message": str(e)}, code=500, success=False)
+
+@app.route("/kubernetes/add_volume")
+def add_volume():
+    try:
+        global kubernetes_object, RUNTIME
+        if RUNTIME is None:
+            return build_response({"message": "containerization has not been started"}, code=400, success=False)
+        if kubernetes_object is None:
+            return build_response({"message": "initailize kubernetes first"}, code=400, success=False)
+        kubernetes_object.add_volume(RUNTIME.get_name())
+        kubernetes_object.add_persistent_volume(RUNTIME.get_name())
+        return build_response({"message": "volume is added"})
+    except Exception as e:
+        return build_response({"message": str(e)}, code=500, success=False)
+
+@app.route("/kubernetes/transfer_data_to_volume")
+def transfer_data_to_volume():
+    try:
+        global kubernetes_object, RUNTIME, _env
+        if RUNTIME is None:
+            return build_response({"message": "containerization has not been started"}, code=400, success=False)
+        if kubernetes_object is None:
+            return build_response({"message": "initailize kubernetes first"}, code=400, success=False)
+        
+        _pod_name = kubernetes_object.get_pod_name()
+        _pod_name = _pod_name.strip()
+
+        _source=ssh.get_user_data_path(partial=True) + RUNTIME.get_process_path() + '/' + 'db_dump.sql'
+        _destination='/tmp/db_dump.sql'
+        _db_password=_env['value']
+        kubernetes_object.transfer_file_to_pod(_source, _destination, _pod_name, _db_password)
+        kubernetes_object.kubectl_restart_pod(_pod_name)
+
+        return build_response({"message": "data transfered successfully"})
+    except Exception as e:
+        return build_response({"message": str(e)}, code=500, success=False)
 
 
-# @app.route("/save_container_in_kubernetes_file")
-# def save_in_kubernetes_file():
-#     try:
-#         global kubernetes_object, RUNTIME
-#         if RUNTIME is None:
-#             return build_response({"message": "containerization has not been started"}, code=400, success=False)
-#         if kubernetes_object is None:
-#             return build_response({"message": "initailize kubernetes first"}, code=400, success=False)
-#         kubernetes_object.add_container(RUNTIME.get_name(), RUNTIME.get_port(), RUNTIME.get_image())
-#         kubernetes_object.add_service(RUNTIME.get_name(), RUNTIME.get_port())
-#         return build_response({"message": "container and service is added"})
-#     except Exception as e:
-#         return build_response({"message": str(e)}, code=500, success=False)
+@app.route("/kubernetes/save")
+def save_kubernetes_file():
+    try:
+        global kubernetes_object, RUNTIME
+        if RUNTIME is None:
+            return build_response({"message": "containerization has not been started"}, code=400, success=False)
+        if kubernetes_object is None:
+            return build_response({"message": "initailize kubernetes first"}, code=400, success=False)
+        kubernetes_object.save_file()
+        return build_response({"message": "saved"})
+    except Exception as e:
+        return build_response({"message": str(e)}, code=500, success=False)
 
-# @app.route("/save_kubernetes_file")
-# def save_kubernetes_file():
-#     try:
-#         global kubernetes_object, ssh
-#         _yaml=kubernetes_object.get_yaml_file()
-#         _path_partial=ssh.get_user_data_path(partial=True)+"/"
-#         _path_partial+= 'kubernetes/'
-#         if not os.path.exists(_path_partial):
-#             os.makedirs(_path_partial)
-#         if os.path.exists(_path_partial+"kube.yaml"):
-#             _kube_file = open(_path_partial+"kube.yaml", 'w')
-#         else:
-#             _kube_file = open(_path_partial+"kube.yaml", 'x')
-#         _kube_file.write(_yaml)
-#         _kube_file.close()
-#         return build_response({"message": "saved"})
-#     except Exception as e:
-#         return build_response({"message": str(e)}, code=500, success=False)
-
-# @app.route("/apply_kubernetes_file")
-# def apply_kubernetes_file():
-#     try:
-#         _path_partial=ssh.get_user_data_path(partial=True)+"/"
-#         _kube_config_path = _path_partial + 'kube_config_file'
-#         _path_partial+= 'kubernetes/'
-#         _kube_yaml_localpath = _path_partial + 'kube.yaml'
-#         _cmd='kubectl --kubeconfig '+ _kube_config_path \
-#             +"kube_config_file create -f "+ _kube_yaml_localpath
-#         print(_cmd)
-#         os.system(_cmd)
-#         return build_response({"message": "applied"})
+@app.route("/kubernetes/apply")
+def apply_kubernetes_file():
+    try:
+        global kubernetes_object
+        if kubernetes_object is None:
+            return build_response({"message": "initailize kubernetes first"}, code=400, success=False)
+        kubernetes_object.kubectl_apply()
+        return build_response({"message": "applied"})
     
-#     except Exception as e:
-#         return build_response({"message": str(e)}, code=500, success=False)
+    except Exception as e:
+        return build_response({"message": str(e)}, code=500, success=False)
 
 @app.route("/logout_vm/<username>/<hostname>")
 def logout_vm(username, hostname):
@@ -388,12 +444,13 @@ def logout_vm(username, hostname):
         return build_response({"message": str(e)}, code=500, success=False)
 
 def clear():
-    global RUNTIME, ssh, docker_client, PROCESS_LIST, kubernetes_object
+    global RUNTIME, ssh, docker_client, PROCESS_LIST, kubernetes_object, _env
     ssh=None
     docker_client=None
     RUNTIME=None
     PROCESS_LIST=[]
     kubernetes_object=None
+    _env=None
 
 if __name__ == '__main__':
 
