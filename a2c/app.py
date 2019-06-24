@@ -3,6 +3,8 @@ from api.ssh import SSH
 from api.runtime.runtime_execution import RuntimeExecution
 from api.kubernetes import Kubernetes
 from api.docker import Docker
+from api.runtime.constants import TOMCAT
+from xml.dom import minidom
 import json
 import os
 
@@ -96,6 +98,44 @@ def is_process_in_process_list(process_port, process_id, process_name):
             i["process_name"]==process_name:
             return True
     return False
+
+def find_tomcat_port(process_id):
+    global ssh
+    tomcat_ports = []
+
+    process_port_info = ssh.get_activate_process_on_port()
+
+    #find tomcat ports
+    for process_tuple in process_port_info:
+        if process_tuple[1] == process_id:
+            tomcat_ports.append(process_tuple[0])
+
+    #code for finding http port
+    _cmd_for_env_var = 'ps -ef | grep catalina | sed -n \'1p\''
+    _, output, _ = ssh.exec_command(_cmd_for_env_var)
+
+    words = output.split()
+
+    result = [i for i in words if i.startswith('-Dcatalina.home')]
+    _CATALINA_HOME = result[0].split('=')[1]
+
+    result = [i for i in words if i.startswith('-Dcatalina.base')]
+    _CATALINA_BASE = result[0].split('=')[1]
+
+    _, output, _error = ssh.exec_command('cat ' + _CATALINA_HOME + '/conf/server.xml')
+
+    xmldoc = minidom.parseString(output)
+    connector_list = xmldoc.getElementsByTagName('Connector')
+    #print(len(connector_list))
+
+    ret_port = '8080'
+    for c in connector_list:
+        _port = c.attributes['port'].value
+        _protocol = c.attributes['protocol'].value
+        if(_protocol == 'HTTP/1.1' and _port in tomcat_ports):
+            ret_port = _port
+    
+    return ret_port
 
 @app.route("/")
 def home():
@@ -246,6 +286,20 @@ def discover_process():
             PROCESS_LIST.append({"process_port": process_tuple[0], 
                             "process_id": process_tuple[1], 
                             "process_name": process_tuple[2]})
+    try:
+        _, output, _ = ssh.exec_command('ps -ef | grep -c catalina')
+        if int(output) > 1:
+            _, output, _=ssh.exec_command('ps -ef | grep catalina | sed -n \'1p\' | awk \'{print $2}\'')
+            
+            process_id = str(output.split('\n')[0])
+            process_port = find_tomcat_port(process_id)
+            PROCESS_LIST.append({
+                "process_port": process_port,
+                "process_id": process_id,
+                "process_name": TOMCAT
+            })
+    except Exception as e:
+        print(e)
     return build_response({"data": PROCESS_LIST})
 
 @app.route("/start_containerization/<process_port>/<process_id>/<process_name>")
