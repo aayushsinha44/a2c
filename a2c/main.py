@@ -61,7 +61,7 @@ if __name__ == '__main__':
     # main()
     password='intern1'
     username='ubuntu'
-    hostname='172.22.6.161'
+    hostname='172.22.6.162'
 
     docker_username="intaayushsinhaml"
     docker_password="aayushsinha"

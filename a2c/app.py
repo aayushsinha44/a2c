@@ -135,7 +135,7 @@ def kube_config_cred():
         if not os.path.exists('user_files/'):
             os.mkdir('user_files/')
 
-        _path='user_files/'
+        _path=''
         if os.path.exists(_path+"kube_config_file"):
             _kube_file = open(_path+"kube_config_file", 'w')
         else:
@@ -312,64 +312,64 @@ def push_container_docker_registry():
     except Exception as e:
         return build_response({"message": str(e)}, code=500, success=False)
 
-@app.route("/initialize_kubernetes/<name>/<no_replica>")
-def initialize_kubernetes_file(name, no_replica):
-    try:
-        global kubernetes_object
-        kubernetes_object=Kubernetes(name, no_replica)
-        return build_response({"message": ""})
-    except Exception as e:
-        return build_response({"message": str(e)}, code=500, success=False)
+# @app.route("/initialize_kubernetes/<name>/<no_replica>")
+# def initialize_kubernetes_file(name, no_replica):
+#     try:
+#         global kubernetes_object
+#         kubernetes_object=Kubernetes(name, no_replica)
+#         return build_response({"message": ""})
+#     except Exception as e:
+#         return build_response({"message": str(e)}, code=500, success=False)
 
 
-@app.route("/save_container_in_kubernetes_file")
-def save_in_kubernetes_file():
-    try:
-        global kubernetes_object, RUNTIME
-        if RUNTIME is None:
-            return build_response({"message": "containerization has not been started"}, code=400, success=False)
-        if kubernetes_object is None:
-            return build_response({"message": "initailize kubernetes first"}, code=400, success=False)
-        kubernetes_object.add_container(RUNTIME.get_name(), RUNTIME.get_port(), RUNTIME.get_image())
-        kubernetes_object.add_service(RUNTIME.get_name(), RUNTIME.get_port())
-        return build_response({"message": "container and service is added"})
-    except Exception as e:
-        return build_response({"message": str(e)}, code=500, success=False)
+# @app.route("/save_container_in_kubernetes_file")
+# def save_in_kubernetes_file():
+#     try:
+#         global kubernetes_object, RUNTIME
+#         if RUNTIME is None:
+#             return build_response({"message": "containerization has not been started"}, code=400, success=False)
+#         if kubernetes_object is None:
+#             return build_response({"message": "initailize kubernetes first"}, code=400, success=False)
+#         kubernetes_object.add_container(RUNTIME.get_name(), RUNTIME.get_port(), RUNTIME.get_image())
+#         kubernetes_object.add_service(RUNTIME.get_name(), RUNTIME.get_port())
+#         return build_response({"message": "container and service is added"})
+#     except Exception as e:
+#         return build_response({"message": str(e)}, code=500, success=False)
 
-@app.route("/save_kubernetes_file")
-def save_kubernetes_file():
-    try:
-        global kubernetes_object, ssh
-        _yaml=kubernetes_object.get_yaml_file()
-        _path_partial=ssh.get_user_data_path(partial=True)+"/"
-        _path_partial+= 'kubernetes/'
-        if not os.path.exists(_path_partial):
-            os.makedirs(_path_partial)
-        if os.path.exists(_path_partial+"kube.yaml"):
-            _kube_file = open(_path_partial+"kube.yaml", 'w')
-        else:
-            _kube_file = open(_path_partial+"kube.yaml", 'x')
-        _kube_file.write(_yaml)
-        _kube_file.close()
-        return build_response({"message": "saved"})
-    except Exception as e:
-        return build_response({"message": str(e)}, code=500, success=False)
+# @app.route("/save_kubernetes_file")
+# def save_kubernetes_file():
+#     try:
+#         global kubernetes_object, ssh
+#         _yaml=kubernetes_object.get_yaml_file()
+#         _path_partial=ssh.get_user_data_path(partial=True)+"/"
+#         _path_partial+= 'kubernetes/'
+#         if not os.path.exists(_path_partial):
+#             os.makedirs(_path_partial)
+#         if os.path.exists(_path_partial+"kube.yaml"):
+#             _kube_file = open(_path_partial+"kube.yaml", 'w')
+#         else:
+#             _kube_file = open(_path_partial+"kube.yaml", 'x')
+#         _kube_file.write(_yaml)
+#         _kube_file.close()
+#         return build_response({"message": "saved"})
+#     except Exception as e:
+#         return build_response({"message": str(e)}, code=500, success=False)
 
-@app.route("/apply_kubernetes_file")
-def apply_kubernetes_file():
-    try:
-        _path_partial=ssh.get_user_data_path(partial=True)+"/"
-        _kube_config_path = _path_partial + 'kube_config_file'
-        _path_partial+= 'kubernetes/'
-        _kube_yaml_localpath = _path_partial + 'kube.yaml'
-        _cmd='kubectl --kubeconfig '+ _kube_config_path \
-            +"kube_config_file create -f "+ _kube_yaml_localpath
-        print(_cmd)
-        os.system(_cmd)
-        return build_response({"message": "applied"})
+# @app.route("/apply_kubernetes_file")
+# def apply_kubernetes_file():
+#     try:
+#         _path_partial=ssh.get_user_data_path(partial=True)+"/"
+#         _kube_config_path = _path_partial + 'kube_config_file'
+#         _path_partial+= 'kubernetes/'
+#         _kube_yaml_localpath = _path_partial + 'kube.yaml'
+#         _cmd='kubectl --kubeconfig '+ _kube_config_path \
+#             +"kube_config_file create -f "+ _kube_yaml_localpath
+#         print(_cmd)
+#         os.system(_cmd)
+#         return build_response({"message": "applied"})
     
-    except Exception as e:
-        return build_response({"message": str(e)}, code=500, success=False)
+#     except Exception as e:
+#         return build_response({"message": str(e)}, code=500, success=False)
 
 @app.route("/logout_vm/<username>/<hostname>")
 def logout_vm(username, hostname):

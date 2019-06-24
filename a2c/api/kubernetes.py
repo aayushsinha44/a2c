@@ -98,7 +98,7 @@ class Kubernetes():
             # "      targetPort: "+port,
             # "      protocol: TCP",
             "  selector:",
-            "    app: "+name,
+            "    app: "+self.name,
             "  type: "+service_type
         ]
         self._services.append(_service)
