@@ -2,13 +2,14 @@ from .runtime import Runtime
 
 class Tomcat(Runtime):
 
-    def __init__(self, process_id, ssh_client, proccess_name, process_port, docker_client):
+    def __init__(self, process_id, ssh_client, proccess_name, process_port, docker_client, vm_data):
         super().__init__(ssh_client, process_id, proccess_name, process_port, docker_client)
         self._CATALINA_HOME = None
         self._CATALINA_BASE = None
         self._CATALINA_BASE_CONTAINER = "/usr/local/tomcat/"
         self._CATALINA_HOME_CONTAINER = "/usr/local/tomcat/"
         self._TOMCAT_VERSION = None
+        self.__vm_data=vm_data
         self._conf_files = []
         self._files = []
         self._war_files=[]
@@ -31,6 +32,7 @@ class Tomcat(Runtime):
         for file in self._conf_files:
             _docker_file.append("COPY "+self.build_path(file["destination"]) + " " + self._CATALINA_HOME_CONTAINER + "conf/" + file["source"].split('/')[-1])
 
+        # _docker_file.append("sed -i 's/original/new/g' file.txt")
         _docker_file.append("EXPOSE " + self.process_port)
         _docker_file.append("")
 

@@ -3,8 +3,9 @@ import re
 
 class Apache(Runtime):
 
-    def __init__(self, process_id, ssh_client, proccess_name, process_port, docker_client):
+    def __init__(self, process_id, ssh_client, proccess_name, process_port, docker_client, vm_data):
         super().__init__(ssh_client, process_id, proccess_name, process_port, docker_client)
+        self.__vm_data=vm_data
         self._HTTPD_ROOT = None
         self._SERVER_CONFIG_FILE = None
         self._files = []

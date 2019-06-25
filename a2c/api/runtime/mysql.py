@@ -8,11 +8,13 @@ class MySQL(Runtime):
                 proccess_name, 
                 process_port, 
                 docker_client, 
+                vm_data,
                 mysql_db_username,
                 mysql_db_password):
         super().__init__(ssh_client, process_id, proccess_name, process_port, docker_client)
         self.__mysql_db_username=mysql_db_username
         self.__mysql_db_password=mysql_db_password
+        self.__vm_data=vm_data
 
         self.generate_dump
 

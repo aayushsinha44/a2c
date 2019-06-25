@@ -4,9 +4,10 @@ import re
 
 class Nginx(Runtime):
 
-    def __init__(self, process_id, ssh_client, proccess_name, process_port, docker_client):
+    def __init__(self, process_id, ssh_client, proccess_name, process_port, docker_client, vm_data):
         super().__init__(ssh_client, process_id, proccess_name, process_port, docker_client)
         self._nginx_conf_files = self.nginx_conf_file()
+        self._vm_data=vm_data
 
     # Abstract class method
     def generate_container_file(self):
