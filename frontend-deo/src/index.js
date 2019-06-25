@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import App from './components/App';
+import RouteList from './route';
 
 ReactDOM.render(
-    <App data='abnc' />,
+    <RouteList />,
     document.querySelector('#root')
 );

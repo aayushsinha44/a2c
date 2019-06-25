@@ -61,6 +61,7 @@ DOCKER_REGISTRY=None
 
 VM_CRED=[]
 CURRENT_VM=None
+VM_PROCESS = dict()
 
 ssh=None
 docker_client=None
@@ -291,7 +292,7 @@ def get_os_info():
         
 @app.route("/discover_process")
 def discover_process():
-    global PROCESS_LIST, ssh
+    global PROCESS_LIST, ssh, VM_PROCESS
     if ssh is None:
         return build_response({"message": "login into vm first"}, code=400, success=False)
     PROCESS_LIST=[]
@@ -317,11 +318,12 @@ def discover_process():
             })
     except Exception as e:
         print(e)
+    VM_PROCESS[CURRENT_VM["hostname"]] = PROCESS_LIST
     return build_response({"data": PROCESS_LIST})
 
 @app.route("/start_containerization/<process_port>/<process_id>/<process_name>")
 def start_containerization(process_port, process_id, process_name):
-    global ssh, docker_client, RUNTIME, PROCESS_LIST
+    global ssh, docker_client, RUNTIME, PROCESS_LIST, VM_PROCESS
 
     if ssh is None:
         return build_response({"message": "login into vm first"}, code=400, success=False)
@@ -330,13 +332,12 @@ def start_containerization(process_port, process_id, process_name):
         return build_response({"message": "invalid data"}, code=400, success=False)
 
     try:
-        vm_data=get_vm_list_excluded()
         runtime_exec = RuntimeExecution(process_port, 
                                         process_id,
                                         process_name, 
                                         ssh, 
                                         docker_client,
-                                        vm_data)
+                                        VM_PROCESS)
         if runtime_exec.is_supported():
             RUNTIME = runtime_exec.get_runtime()
             return build_response({"message": "started"})

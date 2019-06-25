@@ -5,6 +5,18 @@ import re
 class Nginx(Runtime):
 
     def __init__(self, process_id, ssh_client, proccess_name, process_port, docker_client, vm_data):
+        '''
+            vm_data:
+            {
+                "172.22.6.161": [
+                    {
+                        "process_name": "mysqld",
+                        "process_id": 123,
+                        "process_port": 3306
+                    }
+                ]
+            }
+        '''
         super().__init__(ssh_client, process_id, proccess_name, process_port, docker_client)
         self._nginx_conf_files = self.nginx_conf_file()
         self._vm_data=vm_data
