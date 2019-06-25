@@ -60,6 +60,7 @@ DOCKER_PASSWORD=None
 DOCKER_REGISTRY=None
 
 VM_CRED=[]
+CURRENT_VM=None
 
 ssh=None
 docker_client=None
@@ -67,7 +68,6 @@ kubernetes_object=None
 RUNTIME=None
 PROCESS_LIST=[]
 _env=None
-
 
 def build_response(msg, code=200, success=True):
     msg["success"]=success
@@ -89,6 +89,20 @@ def get_vm_cred(username, hostname):
         if cred["username"]==username and cred["hostname"]==hostname:
             return cred
     return {}
+
+def set_current_vm(username, hostname):
+    global VM_CRED, CURRENT_VM
+    for cred in VM_CRED:
+        if cred["username"]==username and cred["hostname"]==hostname:
+            CURRENT_VM=cred
+
+def get_vm_list_excluded():
+    global VM_CRED, CURRENT_VM
+    _excluded_vm=[]
+    for cred in VM_CRED:
+        if cred != CURRENT_VM:
+            _excluded_vm.append(cred)
+    return _excluded_vm
 
 def is_process_in_process_list(process_port, process_id, process_name):
     global PROCESS_LIST
@@ -258,6 +272,8 @@ def login_vm(username, hostname):
         docker_client = Docker(DOCKER_REGISTRY, DOCKER_USERNAME, DOCKER_PASSWORD, ssh, dev=True)
         docker_client.login()
 
+        set_current_vm(username, hostname)
+
         return build_response({"message": "login successful"})
 
     except Exception as e:
@@ -313,11 +329,13 @@ def start_containerization(process_port, process_id, process_name):
         return build_response({"message": "invalid data"}, code=400, success=False)
 
     try:
+        vm_data=get_vm_list_excluded()
         runtime_exec = RuntimeExecution(process_port, 
                                         process_id,
                                         process_name, 
                                         ssh, 
-                                        docker_client)
+                                        docker_client,
+                                        vm_data)
         if runtime_exec.is_supported():
             RUNTIME = runtime_exec.get_runtime()
             return build_response({"message": "started"})
