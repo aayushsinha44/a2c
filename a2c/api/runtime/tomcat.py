@@ -36,7 +36,7 @@ class Tomcat(Runtime):
         #hardcoded logic, need to be changed
         _docker_file.append("RUN mkdir /tmp/GuestBook && cd /tmp/GuestBook && jar -xvf " + 
             self._CATALINA_HOME_CONTAINER + "webapps/GuestBook.war && " +
-            "sed -i 's/172.22.6.161/mysqld/g' /tmp/GuestBook/WEB-INF/classes/guestpack/db_properties.properties && "+
+            "sed -i 's/172.22.6.161/mysqld-service/g' /tmp/GuestBook/WEB-INF/classes/guestpack/db_properties.properties && "+
             "jar -cvf GuestBook.war * && "+
             "mv /tmp/GuestBook/GuestBook.war " + self._CATALINA_HOME_CONTAINER + "webapps/GuestBook.war && "+
             "rm -rf /tmp/GuestBook/")

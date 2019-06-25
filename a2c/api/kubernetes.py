@@ -134,11 +134,11 @@ class Kubernetes():
             yaml = yaml + service
         return '\n'.join(yaml)
 
-    def save_file(self, name='kube.yaml'):
+    def save_file(self, name='kube'):
         _yaml = self.get_yaml_file()
         _path_partial=self._ssh_client.get_user_data_path(partial=True)
         _path_partial+= 'kubernetes/'
-        self.__file_path=_path_partial+name
+        self.__file_path=_path_partial+name+'-'+self.name+'.yaml'
         if not os.path.exists(_path_partial):
             os.makedirs(_path_partial)
         if os.path.exists(self.__file_path):

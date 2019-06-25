@@ -81,6 +81,8 @@ if __name__ == '__main__':
         password=client_tuple[1]
         hostname=client_tuple[2]
 
+        print('Current VM:', hostname)
+
         _client_data_excluded=[]
         for data in client_data:
             if client_data != data:
@@ -118,6 +120,7 @@ if __name__ == '__main__':
                 _runtime.build_container()
                 _runtime.push_container_docker_registry()
                 
+                kubernetes_object=Kubernetes('vm1-'+hostname, ssh)
                 kubernetes_object.add_container(_runtime.get_name(), _runtime.get_port(), _runtime.get_image())
                 kubernetes_object.add_service(_runtime.get_name(), _runtime.get_port())
                 kubernetes_object.save_file()
@@ -141,7 +144,8 @@ if __name__ == '__main__':
                                             vm_data=_client_data_excluded)
             if runtime_exec.is_supported():
                 print("Started:", process_tuple)
-                kubernetes_object=Kubernetes('vm1', ssh)
+                print('Kubernetes object for vm1-'+hostname)
+                kubernetes_object=Kubernetes('vm1-'+hostname, ssh)
 
                 if process_tuple[2] in VOLUME_RUNTIME:
                     _runtime = runtime_exec.get_runtime(mysql_db_username=mysql_db_username,
