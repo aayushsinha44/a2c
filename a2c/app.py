@@ -297,7 +297,8 @@ def discover_process():
     PROCESS_LIST=[]
     process_port_info = ssh.get_activate_process_on_port()
     for process_tuple in process_port_info:
-        runtime_exec = RuntimeExecution(process_tuple[0], process_tuple[1], process_tuple[2], ssh, docker_client)
+        vm_data=get_vm_list_excluded()
+        runtime_exec = RuntimeExecution(process_tuple[0], process_tuple[1], process_tuple[2], ssh, docker_client, vm_data)
         if runtime_exec.is_supported():
             PROCESS_LIST.append({"process_port": process_tuple[0], 
                             "process_id": process_tuple[1], 
