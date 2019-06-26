@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $("button").click(function(){
+    // $.post("http://172.21.212.180:8000/register/",
+    // JSON.stringify({
+    //   username: "aayush",
+    //   password: "aayush",
+    //   name: "Aayush Sinha"
+    // }),
+    // function(data,status){
+    //   alert("Data: " + data + "\nStatus: " + status);
+    // });
+    $.post("http://172.21.212.180:8000/register/", JSON.stringify({
+      username: "aayush12",
+      password: "aayush",
+      name: "Aayush Sinha"
+    }))
+    .done(function(msg){ console.log(msg) })
+    .fail(function(xhr, status, error) {
+        // error handling
+        console.log(status, error,xhr);
+        
+    });
+  });
+});
+</script>
+</head>
+<body>
+ 
+<button>Send an HTTP POST request to a page and get the result back</button>
+ 
+</body>
+</html>
