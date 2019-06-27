@@ -8,7 +8,7 @@ from django.http import HttpResponseBadRequest, HttpResponseServerError, HttpRes
 
 # Login required decorator
 def login_required(view):
-    def inner(request):
+    def inner(request, *args, **kwargs):
         try:
             status = check_token(request.META['HTTP_TOKEN'])
             if status == VALID_TOKEN:
@@ -26,7 +26,7 @@ def login_required(view):
                                                            "code": HTTP_INTERNAL_SERVER_ERROR,
                                                            "message": "something went wrong"}),
                                                content_type='application/json')
-        except:
+        except Exception as e:
             return HttpResponseBadRequest(json.dumps({"success": False,
                                                       "code": HTTP_UNAUTHORIZED,
                                                       "message": "login required"}), content_type='application/json')

@@ -13,7 +13,7 @@ class User():
 
         if User.check_user_structure(user_structure):
 
-            if User.check_user_exists(user_structure["username"], user_structure["password"]):
+            if User.check_user_exists(user_structure["username"]):
                 return USER_EXISTS
             
             UserModel.objects.create(username=user_structure["username"],
@@ -36,8 +36,14 @@ class User():
         return True
 
     @staticmethod
-    def check_user_exists(username, password):
+    def check_user_exists(username):
 
+        if UserModel.objects.filter(username=username).count() > 0:
+            return True
+        return False
+
+    @staticmethod
+    def check_user(username, password):
         if UserModel.objects.filter(username=username, password=password).count() > 0:
             return True
         return False
@@ -92,7 +98,7 @@ class User():
 
         if self.check_docker_cred_exists():
             
-            return list(UserDockerCred.objects.filter(usename=self.get_user_object()).values())[0]
+            return list(UserDockerCred.objects.filter(username=self.get_user_object()).values())[0]
 
         else:
             return DOESNOT_EXISTS
@@ -103,7 +109,7 @@ class User():
         return True
 
     def add_kubernetes_cred(self, data_structure):
-        if self.__check_docker_cred_structure(data_structure):
+        if self.__check_kubernetes_cred_structure(data_structure):
 
             return self.__add_kubernetes_cred(data_structure["kube_conf_file"])
         else:
@@ -139,7 +145,7 @@ class User():
 
         if self.check_kube_cred_exists():
             
-            return list(KubernetesConfigModel.objects.filter(usename=self.get_user_object()).values())[0]
+            return list(KubernetesConfigModel.objects.filter(username=self.get_user_object()).values())[0]
 
         else:
             return DOESNOT_EXISTS

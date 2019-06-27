@@ -32,13 +32,9 @@ def docker_cred(request):
 
             token = Token(request)
             username=token.get_username()
-
             _user=User(username)
-
             _structure = json.loads(request.body.decode())
-
             res = _user.add_docker_cred(_structure)
-
             if res == ADDED_SUCCESS or res == UPDATE_SUCESS:
                 return HttpResponse(json.dumps({
                     "message": res
@@ -50,10 +46,10 @@ def docker_cred(request):
                 }), content_type='application/json')
 
 
-        except Exception as e:
-            return HttpResponseServerError(json.dumps({
-                    'message': str(e)
-                }), content_type='application/json')
+    except Exception as e:
+        return HttpResponseServerError(json.dumps({
+                'message': str(e)
+            }), content_type='application/json')
 
 @login_required
 def kube_cred(request):
@@ -88,7 +84,7 @@ def kube_cred(request):
 
             _structure = json.loads(request.body.decode())
 
-            res = _user.add_kuberentes_cred(_structure)
+            res = _user.add_kubernetes_cred(_structure)
 
             if res == ADDED_SUCCESS or res == UPDATE_SUCESS:
                 return HttpResponse(json.dumps({

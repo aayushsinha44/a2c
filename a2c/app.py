@@ -26,7 +26,6 @@ Endpoints:
 /vm_cred/<username>/<hostname>
 
 /login_vm/<username>/<hostname>
-/operate_vm/<username>/<hostname>
 
 /get_os_info
 /discover_process
