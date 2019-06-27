@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Dashboard</title>
+    <title>Agent Details</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="styles/dashboard.css">
@@ -10,11 +10,10 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="js/cookie.js"></script>
-    <script src="js/dashboard.js"></script>
+    <script src="js/AgentDetails.js"></script>
 </head>
 
 <body>
-
     <div class="container-fluid">
         <div class="row" style="margin-bottom: 0px;">
             <nav class="navbar navbar-inverse" style="margin-bottom: 0px; border-radius: 0px;">
@@ -56,8 +55,14 @@
                 </div>
                 <div class="row" style="padding: 1em;">
                     <span id="error"></span>
-                    dlfkjl;dskjf;ldksjf edjflsdkjflksdjf<br>
-                    dsfkjlsdkjfl;kdsjfl;kdjf<br>
+                    <h1>Agent Details</h1><br/><br/>
+                    <form action="http://172.21.212.180:8000/agent_ip/" method="POST" id="agentform">
+                        <div class="form-group">
+                            <label for="agentip">Agent VM IP Address:</label>
+                            <input type="text" class="form-control" id="agentip" placeholder="Enter Agent VM IP Address" name="agent_ip">
+                        </div>                       
+                        <button type="button" class="btn btn-primary" id="submit">Save</button>
+                    </form>
                 </div>
             </div>
         </div>

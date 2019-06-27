@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Kubernetes Credentials</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="styles/dashboard.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="js/cookie.js"></script>
+    <script src="js/kubCred.js"></script>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row" style="margin-bottom: 0px;">
+            <nav class="navbar navbar-inverse fixed-top" style="margin-bottom: 0px; border-radius: 0px;">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" href="#" style="font-size: 22px; color: #ccc;">A2C</a>
+                    </div>
+                    <ul class="nav navbar-nav navbar-right">
+                    <!-- <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li> -->
+                    <li><a href="#"><span class="glyphicon glyphicon-log-out"></span> Log Out</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+        <div class="row" style="margin-top: 0px; padding-top: 0px;">
+            <div class="col-sm-2" class="sidenav">
+                <!-- Sidebar -->
+                <div id="sidebar-wrapper">
+                    <ul class="sidebar-nav">
+                        <li>
+                            <a href="vmCred.html" id="vm">Virtual Machine</a>
+                        </li>
+                        <li>
+                            <a href="dockerCred.html" id="doc">Docker Credentials</a>
+                        </li>
+                        <li>
+                            <a href="kubCred.html" id="kub">Kubernetes Credentials</a>
+                        </li>
+                        <li>
+                            <a href="AgentDetails.html" id="agent">A2C Agent Details</a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- /#sidebar-wrapper -->
+            </div>
+            <div class="col-sm-10" id="form" style='background-color:white; margin-left: 250px;'>
+                <div class="row">
+                    
+                </div>
+                <div class="row" style="padding: 1em;">
+                    <span id="error"></span>
+                    <h1>Kubernetes Credentials</h1><br/><br/>
+                    <form action="http://172.21.212.180:8000/kube_cred/" method="POST" id="kube">
+                        <div class="form-group">
+                            <label for="kubefile">Kubernetes Config File:</label>
+                            <textarea class="form-control" rows="16" style="width: 95%" id="kubefile" placeholder="Give Kubernetes Config File" name="kubeconf"></textarea>
+                        </div>                        
+                        <button type="button" class="btn btn-primary" id="submit">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
