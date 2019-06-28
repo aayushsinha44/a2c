@@ -12,11 +12,11 @@ $(document).ready(function(){
         success: function(msg) { 
             //alert('Success!' + token); 
             console.log(msg);
-            document.getElementById("registry").value = msg.message.docker_registry;
+            document.getElementById("regis").value = msg.message.docker_registry;
             document.getElementById("uname").value = msg.message.docker_registry_username;
             document.getElementById("pwd").value = msg.message.docker_registry_password;
         },
-        error: function(xhr){console.log("hi" + xhr.responseJSON.message, xhr);}
+        error: function(xhr){console.log(xhr.responseJSON.message, xhr);}
     });
 
     $(document).on("click", "#submit",function(){
@@ -38,6 +38,7 @@ $(document).ready(function(){
             dataType: 'json',
             success: function (data) {
                 console.info(data);
+                window.location.href="/frontend/client/dashboard.html";
             },
             error: function(xhr){console.log("hi" + xhr.responseJSON.message, xhr);}
         });

@@ -15,7 +15,7 @@ $(document).ready(function(){
             console.log(msg);
             document.getElementById("agentip").value = msg.message[0].agent_ip;
         },
-        error: function(xhr){console.log("hi " + xhr.responseJSON.message, xhr);}
+        error: function(xhr){console.log(xhr.responseJSON.message, xhr);}
     });
     
     $(document).on("click", "#submit",function(){
@@ -32,8 +32,12 @@ $(document).ready(function(){
             dataType: 'json',
             success: function (data) {
                 console.info(data);
+                window.location.href="/frontend/client/dashboard.html";
             },
-            error: function(xhr){console.log("hi" + xhr.responseJSON.message, xhr);}
+            error: function(xhr){
+                console.log(xhr.responseJSON.message, xhr);
+                alert(xhr.responseJSON.message);
+            }
         });
     });
 });

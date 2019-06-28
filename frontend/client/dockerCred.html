@@ -11,6 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="js/cookie.js"></script>
     <script src="js/dockerCred.js"></script>
+    <script src="js/logout.js"></script>
     
 </head>
 
@@ -25,7 +26,7 @@
                     </div>
                     <ul class="nav navbar-nav navbar-right">
                     <!-- <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li> -->
-                    <li><a href="#"><span class="glyphicon glyphicon-log-out"></span> Log Out</a></li>
+                    <li><a href="#" id="logout"><span class="glyphicon glyphicon-log-out"></span> Log Out</a></li>
                     </ul>
                 </div>
             </nav>
@@ -61,7 +62,7 @@
                     <form action="http://172.21.212.180:8000/docker_cred/" method="POST" id="doc_reg">
                         <div class="form-group">
                             <label for="registry">Docker Registry:</label>
-                            <input type="text" class="form-control" id="registry" placeholder="Enter Docker Registry" name="registry">
+                            <input type="text" class="form-control" id="regis" placeholder="Enter Docker Registry" name="registry">
                         </div>
                         <div class="form-group">
                             <label for="uname">Docker Registry Username:</label>
@@ -69,7 +70,7 @@
                         </div>
                         <div class="form-group">
                             <label for="pwd">Docker Registry Password:</label>
-                            <input type="password" class="form-control" id="pwd" placeholder="Enter Password" name="pswd">
+                            <input type="text" class="form-control" id="pwd" placeholder="Enter Password" name="pswd">
                         </div>
                         
                         <button type="button" class="btn btn-primary" id="submit">Save</button>
