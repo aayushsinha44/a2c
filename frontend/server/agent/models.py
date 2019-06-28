@@ -21,6 +21,7 @@ class VMModel(models.Model):
     vm_port=models.CharField(max_length=100)
     vm_pKey=models.TextField(null=True, blank=True)
     vm_passphrase=models.CharField(max_length=100, null=True, blank=True)
+    vm_no_replica=models.IntegerField()
 
     def __str__(self):
         str(self.id)

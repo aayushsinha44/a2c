@@ -12,7 +12,7 @@ def login_required(view):
         try:
             status = check_token(request.META['HTTP_TOKEN'])
             if status == VALID_TOKEN:
-                return view(request)
+                return view(request, *args, **kwargs)
             elif status == INVALID_TOKEN:
                 return HttpResponseBadRequest(json.dumps({"success": False,
                                                           "code": HTTP_UNAUTHORIZED,

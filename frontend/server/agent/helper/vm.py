@@ -36,6 +36,7 @@ class VM():
                 vm_port=data_structure["vm_port"],
                 vm_pKey=data_structure["vm_pKey"],
                 vm_passphrase=data_structure["vm_passphrase"],
+                vm_no_replica=data_structure["vm_no_replica"],
                 username=self.__user_object.get_user_object())
         
         return ADDED_SUCCESS
@@ -57,12 +58,14 @@ class VM():
         _vm_object.vm_port = data_structure["vm_port"]
         _vm_object.vm_pKey = data_structure["vm_pKey"]
         _vm_object.vm_passphrase = data_structure["vm_passphrase"]
+        _vm_object.vm_no_replica = data_structure["vm_no_replica"]
         _vm_object.save()
         return UPDATE_SUCCESS
 
     def __check_structure(self, data_structure):
         _param_struct=["vm_username", "vm_hostname",
-                    "vm_password", "vm_port", "vm_pKey", "vm_passphrase"]
+                    "vm_password", "vm_port", "vm_pKey",
+                    "vm_passphrase", "vm_no_replica"]
 
         for key in _param_struct:
             if key not in data_structure:

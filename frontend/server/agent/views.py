@@ -45,7 +45,7 @@ def agent_ip(request):
                     "message": "vm_ip not in json body"
                 }), content_type='application/json')
 
-            res = _agent.add_agent_cred(data_structure["vm_ip"])
+            res = _agent.add_agent_cred(data_structure["agent_ip"])
 
             return HttpResponse(json.dumps({
                 "message": res
@@ -72,6 +72,9 @@ def vm_cred(request, id=None):
 
         _user=User(username)
         _vm = VM(_user)
+        
+        if id=="":
+            id=None
 
         if request.method == 'GET':
 
@@ -81,7 +84,7 @@ def vm_cred(request, id=None):
                 return HttpResponse(json.dumps({
                     "data": res
                 }), content_type='application/json')
-                
+            
             res = _vm.get_vm_cred(id)
 
             return HttpResponse(json.dumps({
