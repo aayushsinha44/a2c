@@ -52,7 +52,7 @@ Endpoints:
 /terminate  -- clears all variable
 '''
 
-os.system("rm -rf user_files/")
+# os.system("rm -rf user_files/")
 
 DOCKER_USERNAME=None
 DOCKER_PASSWORD=None
@@ -259,7 +259,7 @@ def login_vm(username, hostname):
         return build_response({"message": "no such vm"}, code=400, success=False)
 
     try:
-    
+        
         vm_cred=get_vm_cred(username, hostname)
         ssh = SSH(hostname=vm_cred["hostname"], 
                 port=vm_cred["port"], 

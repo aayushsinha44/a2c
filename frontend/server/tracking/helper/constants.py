@@ -1,0 +1,5 @@
+AGENT_IN_USE='agent in use'
+SUCCESS='success'
+DOCKER_CRED_DOESNOT_EXISTS='docker cred doesnot exists'
+KUBE_CRED_DOESNOT_EXISTS='kubernetes cred doesnot exists'
+AGENT_CRED_DOESNOT_EXISTS='agent cred doesnot exists'

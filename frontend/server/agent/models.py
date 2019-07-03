@@ -19,12 +19,12 @@ class VMModel(models.Model):
     vm_username=models.CharField(max_length=100)
     vm_password=models.CharField(max_length=255, null=True, blank=True)
     vm_port=models.CharField(max_length=100)
-    vm_pKey=models.TextField(null=True, blank=True)
-    vm_passphrase=models.CharField(max_length=100, null=True, blank=True)
+    vm_pKey=models.TextField(null=True, default=None)
+    vm_passphrase=models.CharField(max_length=100, null=True, default=None)
     vm_no_replica=models.IntegerField()
 
     def __str__(self):
-        str(self.id)
+        return str(self.id)
 
     class Meta:
         unique_together = (("username", "vm_hostname"),)
