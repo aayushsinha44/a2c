@@ -6,6 +6,8 @@ from tracking.helper.constants import AGENT_IN_USE, SUCCESS, \
     DOCKER_CRED_DOESNOT_EXISTS, KUBE_CRED_DOESNOT_EXISTS, \
     AGENT_CRED_DOESNOT_EXISTS
 import requests
+import random
+import string
 
 class Tracking():
 
@@ -146,7 +148,7 @@ class Tracking():
                 # initialize kubernetes
                 _no_rep=self.__vm.get_vm_cred(_vm_id)[0]["vm_no_replica"]
                 self.__agent_call.request(
-                    '/initialize_kubernetes/'+str(_vm_id)+'/'+str(_no_rep)
+                    '/initialize_kubernetes/'+self.get_random_name()+'/'+str(_no_rep)
                 )
                 _vm_status_model=self.__get_vm_status_model(_vm_id)
                 _vm_status_model.initialize_kubernetes=True
@@ -179,6 +181,13 @@ class Tracking():
         else:
             print(self.check_system())
             return self.check_system()
+
+    def get_random_name(self):
+        secret_key = []
+        for _ in range(10):
+            secret_key.append(random.choice(string.ascii_letters))
+        return ("".join(secret_key)).lower()
+
         
     def __get_vm_status_model(self, vm_id):
         return VMStatusModel.objects.get(
@@ -234,12 +243,22 @@ class Tracking():
                 vm_id=self.__vm.get_vm_object(vm_id),
                 process_id=self.__get_vm_process_model(vm_id)
             )
-
-            self.__start_containerization(
-                process["process_port"],
-                process["process_id"],
-                process["process_name"]
-            )
+            if process["process_name"] == 'mysqld':
+                self.__start_containerization(
+                    '/start_containerization/mysql/',
+                    process["process_port"],
+                    process["process_id"],
+                    process["process_name"],
+                    "aayush",
+                    "aayush"
+                )
+            else:
+                self.__start_containerization(
+                    '/start_containerization/',
+                    process["process_port"],
+                    process["process_id"],
+                    process["process_name"]
+                )
 
             _vm_process_status=self.__get_vm_process_status_model(
                 vm_id,
@@ -281,7 +300,13 @@ class Tracking():
             _vm_process_status.save()
 
             # kubernetes_add_container
-            self.__agent_call.request('/kubernetes/add_container')
+            if process["process_name"] == 'mysqld':
+                _data=dict()
+                _data["name"]="MYSQL_ROOT_PASSWORD"
+                _data["value"]="aayush"
+                self.__agent_call.request('/kubernetes/add_container', method='GET', data=_data)
+            else:
+                self.__agent_call.request('/kubernetes/add_container')
             _vm_process_status=self.__get_vm_process_status_model(
                 vm_id,
                 process["process_id"])
@@ -318,9 +343,14 @@ class Tracking():
                 _vm_process_status.save()
 
 
-    def __start_containerization(self, process_port, process_id, process_name):
-        self.__agent_call.request('/start_containerization/'+\
-            process_port+'/'+process_id+'/'+process_name)
+    def __start_containerization(self, url, process_port, process_id, process_name, mysql_username=None, mysql_password=None):
+        if mysql_username is None and mysql_password is None:
+            self.__agent_call.request(url+\
+                process_port+'/'+process_id+'/'+process_name)
+        else:
+            self.__agent_call.request(url+\
+                process_port+'/'+process_id+'/'+process_name+'/'+\
+                    mysql_username+'/'+mysql_password)
 
 
     def __discover_process(self):
@@ -357,13 +387,14 @@ class AgentCall():
             self.__agent_ip = self.__agent_ip[:-1]
 
     def request(self, url, data={}, method='GET'):
-        # print('url', url)
+        print('url', url)
         if method=='POST':
             r = requests.post(self.__agent_ip+url, json=data)
         elif method == 'GET':
             r = requests.get(self.__agent_ip+url, json=data)
+        print(r.text)
         out = r.json()
         # if out["code"] == 200:
         #     return SUCCESS
-        print('request', url, out)
+        print('request', out)
         return out

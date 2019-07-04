@@ -9,28 +9,28 @@ from django.http import HttpResponseBadRequest, HttpResponseServerError, HttpRes
 # Login required decorator
 def login_required(view):
     def inner(request, *args, **kwargs):
-        try:
-            status = check_token(request.META['HTTP_TOKEN'])
-            if status == VALID_TOKEN:
-                return view(request, *args, **kwargs)
-            elif status == INVALID_TOKEN:
-                return HttpResponseBadRequest(json.dumps({"success": False,
-                                                          "code": HTTP_UNAUTHORIZED,
-                                                          "message": "invalid token"}), content_type='application/json')
-            elif status == TOKEN_EXPIRED:
-                return HttpResponseBadRequest(json.dumps({"success": False,
-                                                          "code": HTTP_UNAUTHORIZED,
-                                                          "message": "token expired"}), content_type='application/json')
-            else:
-                return HttpResponseServerError(json.dumps({"success": False,
-                                                           "code": HTTP_INTERNAL_SERVER_ERROR,
-                                                           "message": "something went wrong"}),
-                                               content_type='application/json')
-        except Exception as e:
+        if 'HTTP_TOKEN' not in request.META:
             return HttpResponseBadRequest(json.dumps({"success": False,
-                                                      "code": HTTP_UNAUTHORIZED,
-                                                      "message": "login required"}), content_type='application/json')
+                                                    "code": HTTP_UNAUTHORIZED,
+                                                    "message": "login required"}), content_type='application/json')
 
+        status = check_token(request.META['HTTP_TOKEN'])
+        if status == VALID_TOKEN:
+            return view(request, *args, **kwargs)
+        elif status == INVALID_TOKEN:
+            return HttpResponseBadRequest(json.dumps({"success": False,
+                                                        "code": HTTP_UNAUTHORIZED,
+                                                        "message": "invalid token"}), content_type='application/json')
+        elif status == TOKEN_EXPIRED:
+            return HttpResponseBadRequest(json.dumps({"success": False,
+                                                        "code": HTTP_UNAUTHORIZED,
+                                                        "message": "token expired"}), content_type='application/json')
+        else:
+            return HttpResponseServerError(json.dumps({"success": False,
+                                                        "code": HTTP_INTERNAL_SERVER_ERROR,
+                                                        "message": "something went wrong"}),
+                                            content_type='application/json')
+    
     return inner
 
 def register(request):

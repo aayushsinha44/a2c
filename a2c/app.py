@@ -338,6 +338,7 @@ def start_containerization(process_port, process_id, process_name):
                                         docker_client,
                                         VM_PROCESS)
         if runtime_exec.is_supported():
+
             RUNTIME = runtime_exec.get_runtime()
             return build_response({"message": "started"})
         else:
@@ -345,6 +346,35 @@ def start_containerization(process_port, process_id, process_name):
 
     except Exception as e:
         return build_response({"message": str(e)}, code=500, success=False)
+
+@app.route("/start_containerization/mysql/<process_port>/<process_id>/<process_name>/<mysql_username>/<mysql_password>")
+def start_containerization_mysql(process_port, process_id, process_name, mysql_username, mysql_password):
+    global ssh, docker_client, RUNTIME, PROCESS_LIST, VM_PROCESS
+
+    if ssh is None:
+        return build_response({"message": "login into vm first"}, code=400, success=False)
+
+    if not is_process_in_process_list(process_port, process_id, process_name):
+        return build_response({"message": "invalid data"}, code=400, success=False)
+
+    try:
+        runtime_exec = RuntimeExecution(process_port, 
+                                        process_id,
+                                        process_name, 
+                                        ssh, 
+                                        docker_client,
+                                        VM_PROCESS)
+        if runtime_exec.is_supported():
+            
+            RUNTIME = runtime_exec.get_runtime(mysql_db_username=mysql_username,
+                                                mysql_db_password=mysql_password)
+            return build_response({"message": "started"})
+        else:
+            return build_response({"message": "process is not supported"}, code=400, success=False)
+
+    except Exception as e:
+        return build_response({"message": str(e)}, code=500, success=False)
+
 
 @app.route("/save_code")
 def save_code():
@@ -400,7 +430,7 @@ def initialize_kubernetes_file(name, no_replica):
         global kubernetes_object, ssh
         if ssh is None:
             return build_response({"message": "login into vm first"}, code=400, success=False)
-        kubernetes_object=Kubernetes(name, no_replica, ssh)
+        kubernetes_object=Kubernetes(name, ssh, no_replica)
         return build_response({"message": ""})
     except Exception as e:
         return build_response({"message": str(e)}, code=500, success=False)
@@ -455,7 +485,7 @@ def add_volume():
 @app.route("/kubernetes/transfer_data_to_volume")
 def transfer_data_to_volume():
     try:
-        global kubernetes_object, RUNTIME, _env
+        global kubernetes_object, RUNTIME, _env, ssh
         if RUNTIME is None:
             return build_response({"message": "containerization has not been started"}, code=400, success=False)
         if kubernetes_object is None:
