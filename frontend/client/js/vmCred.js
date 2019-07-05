@@ -5,6 +5,7 @@ var pool_id = getCookie('poolid');
 
 
 
+
 // code on loading 
 $(window).on("load", function(){
     console.log(token);
@@ -41,11 +42,12 @@ $(window).on("load", function(){
                     beforeSend: function(xhr){xhr.setRequestHeader('token', token);},
                     success: function(msg) { 
                         if(msg.data.pool_info["in_use"] == true){
-                            document.getElementById("start").disabled = true;
-                            document.getElementById("addnew").disabled = true;
+                            disableStartAndAddButtons();
                         }
                     },
-                    error: function(xhr){console.log(xhr.responseJSON.message, xhr);}
+                    error: function(xhr){
+                        console.log(xhr.responseJSON.message, xhr);
+                    }
                 });
             }
             
@@ -206,11 +208,10 @@ $(document).ready(function(){
                 //alert('Success!' + token);
                 if(msg.message == "started"){
                     pool_id = msg.pool_id;
-                    setCookie("poolid",pool_id,30);
+                    setCookie("poolid",pool_id,1);
                     console.log(pool_id);
                 }
-                document.getElementById("start").disabled = true;
-                document.getElementById("addnew").disabled = true;
+                disableStartAndAddButtons();
 
                 console.log(msg);
             },
@@ -236,7 +237,7 @@ function showDetails(id, t) {
     var purpose = $(t).attr("id");
     if (purpose == "show") {
         $(id).show();
-        $(t).html("<label>Show less&nbsp;&nbsp;</label><i class='fa fa-angle-up'></i>");
+        $(t).html("<label>Show less&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label><i class='fa fa-angle-up'></i>");
         $(t).attr("id", "hide");
     } else {
         $(id).hide();
@@ -247,51 +248,173 @@ function showDetails(id, t) {
 function getThisVMStatus(data){
     var id = data.id;
 
-    var spinner = '<i class="fa fa-circle-o-notch fa-spin" style="font-size:18px"></i>';
-    var tick = '<i class="fa fa-check" style="font-size:18px;color:green"></i>'
-
-
     
-    var current_data = worker(data);
 
-    var code = '<br>hello, Hi there ' + id + '&nbsp;&nbsp;' + tick + spinner;
-    console.log("hello");
-    document.getElementById("details"+id).innerHTML = code;
+
+    //console.log("before worker call " + id);
+    worker(data);
+
+    //console.log(current_data + " " + id);
+
+    var code = '<br>hello, Hi there ' + id + '&nbsp;&nbsp;' + tick + '&nbsp;&nbsp;' + spinner;
+    //console.log("hello " + id);
+    //document.getElementById("details"+id).innerHTML = current_data;
     
 }
+var spinner = '<i class="fa fa-circle-o-notch fa-spin"></i>';
+var tick = '<i class="fa fa-check" style="color:green"></i>';
+
+var list_start = '<ul class="list-group" style="width:40%">';
+var list_end = '</ul>';
+
+var list_div_start = '<div class="container">';
+var list_div_end = '</div>';
+
+var list_item_heading_start = '<h4 class="list-group-item-heading">';
+var list_item_heading_end = '</h4>';
+
+var list_item_text_start = '<p class="list-group-item-text">';
+var list_item_text_end = '</p>';
+
+var gap = '&nbsp;&nbsp;&nbsp;';
 
 function worker(d) {
     $.ajax({
-        url: "http://172.21.212.180:8000/track/21",
+        url: "http://172.21.212.180:8000/track/" + pool_id,
         type: "GET",
         beforeSend: function(xhr){xhr.setRequestHeader('token', token);},
         success: function(msg) {
             //todo process and return data
-            console.log("hi");
+            console.log("hi " + d.id);
+
+            var ret_code="";
+            if(msg.data.pool_info["in_use"] == true){
+                var id = d.id;
+                var vm_found_in_status_info = false;
+
+                ret_code += '<br/>' + list_start;
+                for(vm_status in msg.data.vm_status_info){ //Searching for status of a particular VM
+                    if(msg.data.vm_status_info[vm_status].vm_id == id){ //If the VM is the current VM
+                        vm_found_in_status_info = true; //flag variable
+
+                        ret_code += list_div_start;
+                        ret_code += list_item_heading_start;
+
+                        if(msg.data.vm_status_info[vm_status].login_status){ // login status true
+                            ret_code += "Login" + gap + tick;
+
+                            ret_code += list_item_heading_start;
+                            if(msg.data.vm_status_info[vm_status].initialize_kubernetes){ //initialize_kubernetes is done
+                                ret_code += "Initializing Kubernetes" + gap + tick;
+                                ret_code += list_item_heading_start;
+                                if(msg.data.vm_status_info[vm_status].process_discovery){ //Process Discovery Done
+                                    ret_code += "Process Discovery" + gap + tick;
+
+                                }
+                                else{ // Process Discovery Not Done
+                                    ret_code += "Process Discovery" + gap + spinner;
+                                    ret_code += list_item_heading_start;
+                                    ret_code += "Kubernetes Save" + gap + spinner;
+                                    ret_code += list_item_heading_end;
+                                    ret_code += list_item_heading_start;
+                                    ret_code += "Kubernetes Apply" + gap + spinner;
+                                    ret_code += list_item_heading_end;
+                                }
+                                ret_code += list_item_heading_end;
+
+                            }
+                            else{ //initialize kubernetes is not done
+                                ret_code += "Initializing Kubernetes" + gap + spinner;
+                                ret_code += list_item_heading_start;
+                                ret_code += "Process Discovery" + gap + spinner;
+                                ret_code += list_item_heading_end;
+                                ret_code += list_item_heading_start;
+                                ret_code += "Kubernetes Save" + gap + spinner;
+                                ret_code += list_item_heading_end;
+                                ret_code += list_item_heading_start;
+                                ret_code += "Kubernetes Apply" + gap + spinner;
+                                ret_code += list_item_heading_end;
+                            }
+                            ret_code += list_item_heading_end;
+                        }
+                        else{   //login_status false
+                            ret_code += "Login" + gap + spinner;
+                            ret_code += list_item_heading_start;
+                            ret_code += "Initializing Kubernetes" + gap + spinner;
+                            ret_code += list_item_heading_end;
+                            ret_code += list_item_heading_start;
+                            ret_code += "Process Discovery" + gap + spinner;
+                            ret_code += list_item_heading_end;
+                            ret_code += list_item_heading_start;
+                            ret_code += "Kubernetes Save" + gap + spinner;
+                            ret_code += list_item_heading_end;
+                            ret_code += list_item_heading_start;
+                            ret_code += "Kubernetes Apply" + gap + spinner;
+                            ret_code += list_item_heading_end;
+                        }
+                        ret_code += list_item_heading_end;
+                        ret_code += list_div_end;
+                    }
+                }
+
+                
+                ret_code += list_end;
+
+                if(!vm_found_in_status_info){
+                    ret_code = "<br><label>Agent Not Working on this VM<label>&nbsp;&nbsp;" + spinner;
+                }
+
+            }
+            else{ //Agent Not in use
+                document.location.reload(true);
+            }
+            
 
 
             setTimeout(function() {getThisVMStatus(d);}, 4000);
-            return true;
+
+            document.getElementById("details"+id).innerHTML = ret_code;
+            return ret_code;
             
-        },
-        complete: function() {
-        // Schedule the next request when the current one's complete
-        
         }
     });
 }
 function addEntryOnPage(data){
-    //console.log(data);
     var edit_button = "<button class='btn btn-xs btn-warning edit_vm'><i class='fa fa-edit'></i>&nbsp;&nbsp;Edit</button>&nbsp;&nbsp;";
     var delete_button = "<button class='btn btn-xs btn-danger remove_vm'><i class='fa fa-trash'></i>&nbsp;&nbsp;Remove</button><br>";
-    var vm_details = "<br><span id='details" + data.id + "' style='display: none'>Containerization Not Started</span>";
+    var vm_details = "<br><span id='details" + data.id + "' style='display: none'><h3>Containerization Not Started</h3></span>";
     var vm_display = "<span><label>" + data.vm_username + "@" + data.vm_hostname + "</label></span><br>";
     var new_vm = "<div class='row' id=" + data.id + " style='margin: 1em; border: 1px solid grey; border-radius: 4px; padding: 1em; width: 95%'> \
                 <span style='float: right'>" + edit_button + delete_button + "</span>" + 
                 vm_display + 
-                "<button class='btn btn-sm btn-outline-info' id='show' onclick='showDetails(details" + data.id + ", this)'><label>Show status&nbsp;&nbsp;</label><i class='fa fa-angle-down'></i></button>" + 
+                "<br><button class='btn btn-sm btn-outline-info' id='show' onclick='showDetails(details" + data.id + ", this)'><label>Show status&nbsp;&nbsp;</label><i class='fa fa-angle-down'></i></button>" + 
                 vm_details + 
                 "</div>";
     $(".vm").append(new_vm);
-    // getThisVMStatus(data);
+
+    if(pool_id){
+        $.ajax({
+            url: "http://172.21.212.180:8000/track/" + pool_id,
+            type: "GET",
+            beforeSend: function(xhr){xhr.setRequestHeader('token', token);},
+            success: function(msg) { 
+                if(msg.data.pool_info["in_use"] == true){
+                    getThisVMStatus(data);
+                }
+            },
+            error: function(xhr){
+                console.log(xhr.responseJSON.message, xhr);
+            }
+        });
+    }
+}
+
+function disableStartAndAddButtons(){
+    document.getElementById("start").disabled = true;
+    document.getElementById("addnew").disabled = true;
+}
+
+function enableStartAndAddButtons(){
+    document.getElementById("start").disabled = false;
+    document.getElementById("addnew").disabled = false;
 }

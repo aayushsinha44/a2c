@@ -4,7 +4,7 @@ $(document).ready(function(){
     $(document).on("click", "#start", function(){
         console.log(token);
         $.ajax({
-            url: "http://172.21.212.180:8000/track/23",
+            url: "http://172.21.212.180:8000/track/14",
             type: "GET",
             beforeSend: function(xhr){xhr.setRequestHeader('token', token);},
             success: function(msg) { 
@@ -46,3 +46,7 @@ $(document).ready(function(){
 
 
 });
+
+function makeCookie(n){
+    setCookie("poolid", n, 1);
+}
