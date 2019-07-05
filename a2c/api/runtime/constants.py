@@ -1,4 +1,4 @@
-NGINX="nginx:"
+NGINX="nginx"
 PYTHON="python"
 JAVA="java"
 APACHE="apache2"

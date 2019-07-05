@@ -6,6 +6,7 @@ from api.docker import Docker
 from api.runtime.constants import TOMCAT
 from xml.dom import minidom
 import json
+import subprocess
 import os
 
 HOST='0.0.0.0'
@@ -48,6 +49,8 @@ Endpoints:
 /get_kubernetes_file
 
 /logout_vm
+
+/kubernetes/get_services
 
 /terminate  -- clears all variable
 '''
@@ -545,6 +548,14 @@ def logout_vm(username, hostname):
 
     except Exception as e:
         return build_response({"message": str(e)}, code=500, success=False)
+
+@app.route('/kubernetes/get_services')
+def kubernetes_get_services(self):
+    _cmd='kubectl --kubeconfig kube_config_file get pods'
+    p = subprocess.Popen(_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output, _ = p.communicate()
+    output = str(output.decode())
+    return build_response({"message"})
 
 def clear():
     global RUNTIME, ssh, docker_client, PROCESS_LIST, kubernetes_object, _env

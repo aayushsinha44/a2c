@@ -76,7 +76,10 @@ class SSH:
             for line in out:
                 ip_port, process = line.split(" ")
                 if len(process.split("/")) == 2:
-                    data.add((ip_port.split(':')[-1], process.split('/')[0], process.split('/')[1][:-1]))
+                    if process.split('/')[1][:-1][-1]==':':
+                        data.add((ip_port.split(':')[-1], process.split('/')[0], process.split('/')[1][:-2]))    
+                    else:
+                        data.add((ip_port.split(':')[-1], process.split('/')[0], process.split('/')[1][:-1]))
             return data
         
         else:

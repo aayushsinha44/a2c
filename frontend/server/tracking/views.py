@@ -70,3 +70,29 @@ def track(request, pool_id=None):
         return HttpResponseServerError(json.dumps({
             "message": str(e)
         }), content_type='application/json')
+
+@login_required
+def get_services(request):
+    try:
+
+        token = Token(request)
+        username=token.get_username()
+
+        _user=User(username)
+
+        _tracking = Tracking(_user, [])
+
+        _res = _tracking.check_system()
+        if _res != SUCCESS:
+            return HttpResponseBadRequest(json.dumps({
+                "message": _res
+            }), content_type='application/json')
+
+        return HttpResponse(json.dumps({
+            "message": _tracking.get_services(),
+        }), content_type='application/json')
+
+    except Exception as e:
+        return HttpResponseServerError(json.dumps({
+            "message": str(e)
+        }), content_type='application/json')

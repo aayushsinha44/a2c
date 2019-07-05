@@ -115,6 +115,22 @@ class Tracking():
             pool_id=self.__pool_object
         )
 
+    def get_services(self):
+
+        if self.check_system() == SUCCESS:
+            self.__agent_call=AgentCall(self.__agent.get_agent_ip())
+            
+            self.__lock_agent()
+
+            # add kubernetes cred
+            self.__set_kubernetes_cred()
+
+            _msg = self.__agent_call.request('/kubernetes/get_services')
+            self.__unlock_agent()
+            return _msg["message"]
+
+        else:
+            return self.check_system()
 
     def start(self):
 
@@ -257,7 +273,7 @@ class Tracking():
                     '/start_containerization/',
                     process["process_port"],
                     process["process_id"],
-                    process["process_name"]
+                    self.__handle_url_params(process["process_name"])
                 )
 
             _vm_process_status=self.__get_vm_process_status_model(
@@ -363,6 +379,17 @@ class Tracking():
     def __vm_logout(self, username, hostname):
         _res = self.__agent_call.request('/logout_vm/'+username+'/'+hostname)
         
+    def __handle_url_params(self, val):
+        if ":" in val:
+            _val=""
+            for i in val:
+                if i == ":":
+                    _val += "%3A"
+                else:
+                    _val += i
+            return _val
+        else:
+            return val
 
     def __add_vm_to_agent(self, _vm_id):
         _vm_data=self.__vm.get_vm_cred(_vm_id)[0]

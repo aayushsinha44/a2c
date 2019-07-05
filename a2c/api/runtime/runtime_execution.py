@@ -31,7 +31,7 @@ class RuntimeExecution():
             if self.process_name == NGINX:
                 _runtime = Nginx(self.process_id, 
                                 self.ssh_client, 
-                                self.process_name[:-1], 
+                                self.process_name, 
                                 self.process_port, 
                                 self.docker_client,
                                 self.vm_data)
@@ -73,7 +73,7 @@ class RuntimeExecution():
             if self.process_name == NGINX:
                 _runtime = Nginx(self.process_id, 
                                 self.ssh_client, 
-                                self.process_name[:-1], 
+                                self.process_name, 
                                 self.process_port, 
                                 self.docker_client,
                                 self.vm_data)
