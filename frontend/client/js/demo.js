@@ -1,10 +1,11 @@
 var token = getCookie('user_token');
 
+
 $(document).ready(function(){
     $(document).on("click", "#start", function(){
         console.log(token);
         $.ajax({
-            url: "http://172.21.212.180:8000/track/14",
+            url: "http://172.21.212.180:8000/track/30",
             type: "GET",
             beforeSend: function(xhr){xhr.setRequestHeader('token', token);},
             success: function(msg) { 

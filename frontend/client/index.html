@@ -1,33 +1,15 @@
 <!DOCTYPE html>
 <html>
-<head>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js" type="text/javascript"></script>
-<script type="text/javascript">
-$(document).ready(function(){
-  $("button").click(function(){
-    // $.post("http://172.21.212.180:8000/register/",
-    // JSON.stringify({
-    //   username: "aayush",
-    //   password: "aayush",
-    //   name: "Aayush Sinha"
-    // }),
-    // function(data,status){
-    //   alert("Data: " + data + "\nStatus: " + status);
-    // });
-    $.post("http://172.21.212.180:8000/register/", JSON.stringify({
-      username: "aayush12",
-      password: "aayush",
-      name: "Aayush Sinha"
-    }))
-    .done(function(msg){ console.log(msg) })
-    .fail(function(xhr, status, error) {
-        // error handling
-        console.log(status, error,xhr);
-        
-    });
-  });
-});
-</script>
+  <head>
+    <title>Index</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="styles/dashboard.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 </head>
 <body>
     
@@ -48,6 +30,10 @@ $(document).ready(function(){
     <div class="list-group-item">
       <h4 class="list-group-item-heading">First List Group Item Heading&nbsp;&nbsp;<i class="fa fa-circle-o-notch fa-spin"></i></h4>
         <p class="list-group-item-text">List Group&nbsp;&nbsp;&nbsp;<i class="fa fa-circle-o-notch fa-spin"></i></p>
+        <div class="list-group-item">
+            <h4 class="list-group-item-heading strong">First List Group Item Heading&nbsp;&nbsp;<i class="fa fa-circle-o-notch fa-spin"></i></h4>
+            <p class="list-group-item-text">List Group Item Text&nbsp;&nbsp;&nbsp;<i class="fa fa-check" style="color:green"></i></p>
+        </div>
         <p class="list-group-item-text">List Group Item Text&nbsp;&nbsp;&nbsp;<i class="fa fa-check" style="color:green"></i></p>
         <p class="list-group-item-text">List Group Item&nbsp;&nbsp;&nbsp;<i class="fa fa-circle-o-notch fa-spin"></i></p>
     </div>

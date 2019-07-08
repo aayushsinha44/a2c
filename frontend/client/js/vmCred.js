@@ -302,17 +302,22 @@ function worker(d) {
 
                         if(msg.data.vm_status_info[vm_status].login_status){ // login status true
                             ret_code += "Login" + gap + tick;
+                            ret_code += list_item_heading_end;
 
                             ret_code += list_item_heading_start;
                             if(msg.data.vm_status_info[vm_status].initialize_kubernetes){ //initialize_kubernetes is done
                                 ret_code += "Initializing Kubernetes" + gap + tick;
+                                ret_code += list_item_heading_end;
                                 ret_code += list_item_heading_start;
                                 if(msg.data.vm_status_info[vm_status].process_discovery){ //Process Discovery Done
                                     ret_code += "Process Discovery" + gap + tick;
+                                    ret_code += list_item_heading_end;
+                                    ret_code += displayProcessInfo(msg, id);
 
                                 }
                                 else{ // Process Discovery Not Done
                                     ret_code += "Process Discovery" + gap + spinner;
+                                    ret_code += list_item_heading_end;
                                     ret_code += list_item_heading_start;
                                     ret_code += "Kubernetes Save" + gap + spinner;
                                     ret_code += list_item_heading_end;
@@ -320,11 +325,10 @@ function worker(d) {
                                     ret_code += "Kubernetes Apply" + gap + spinner;
                                     ret_code += list_item_heading_end;
                                 }
-                                ret_code += list_item_heading_end;
-
                             }
                             else{ //initialize kubernetes is not done
                                 ret_code += "Initializing Kubernetes" + gap + spinner;
+                                ret_code += list_item_heading_end;
                                 ret_code += list_item_heading_start;
                                 ret_code += "Process Discovery" + gap + spinner;
                                 ret_code += list_item_heading_end;
@@ -335,10 +339,10 @@ function worker(d) {
                                 ret_code += "Kubernetes Apply" + gap + spinner;
                                 ret_code += list_item_heading_end;
                             }
-                            ret_code += list_item_heading_end;
                         }
                         else{   //login_status false
                             ret_code += "Login" + gap + spinner;
+                            ret_code += list_item_heading_end;
                             ret_code += list_item_heading_start;
                             ret_code += "Initializing Kubernetes" + gap + spinner;
                             ret_code += list_item_heading_end;
@@ -352,12 +356,9 @@ function worker(d) {
                             ret_code += "Kubernetes Apply" + gap + spinner;
                             ret_code += list_item_heading_end;
                         }
-                        ret_code += list_item_heading_end;
                         ret_code += list_div_end;
                     }
                 }
-
-                
                 ret_code += list_end;
 
                 if(!vm_found_in_status_info){
@@ -368,26 +369,256 @@ function worker(d) {
             else{ //Agent Not in use
                 document.location.reload(true);
             }
-            
-
-
             setTimeout(function() {getThisVMStatus(d);}, 4000);
 
             document.getElementById("details"+id).innerHTML = ret_code;
-            return ret_code;
-            
         }
     });
+}
+function displayProcessInfo(msg, id){
+    var ret_code = "";
+
+    for(vm_process in msg.data.vm_process_info){
+        if(msg.data.vm_process_info[vm_process].vm_id_id == id){
+            var pid = msg.data.vm_process_info[vm_process].id;
+            ret_code += list_div_start;
+
+            ret_code += list_item_heading_start;
+            ret_code += "<b>Process:</b> " + msg.data.vm_process_info[vm_process].process_name + ", <b>Process Id:</b> " + msg.data.vm_process_info[vm_process].process_id + ", <b>Process Port:</b> " + msg.data.vm_process_info[vm_process].process_port;
+            ret_code += list_item_heading_end;
+
+            for(vm_process_status in msg.data.vm_process_status_info){
+                if(msg.data.vm_process_status_info[vm_process_status].process_id_id == pid){
+
+                    ret_code += list_item_text_start;
+                    if(msg.data.vm_process_status_info[vm_process_status].start_containerization){ //If Started Containerization
+                        ret_code += "Start Containerization" + gap + tick;
+                        ret_code += list_item_text_end;
+                        ret_code += list_item_text_start;
+                        if(msg.data.vm_process_status_info[vm_process_status].save_code){ //If Code saved
+                            ret_code += "Save Code" + gap + tick;
+                            ret_code += list_item_text_end;
+                            ret_code += list_item_text_start;
+                            if(msg.data.vm_process_status_info[vm_process_status].save_container_info){//If container info saved
+                                ret_code += "Save Container Info" + gap + tick;
+                                ret_code += list_item_text_end;
+                                ret_code += list_item_text_start;
+                                if(msg.data.vm_process_status_info[vm_process_status].build_container){ //if build container
+                                    ret_code += "Build Container" + gap + tick;
+                                    ret_code += list_item_text_end;
+                                    ret_code += list_item_text_start;
+                                    if(msg.data.vm_process_status_info[vm_process_status].push_container_docker_registry){ //if container pushed to docker registry
+                                        ret_code += "Push Container to Docker Registry" + gap + tick;
+                                        ret_code += list_item_text_end;
+                                        ret_code += list_item_text_start;
+                                        if(msg.data.vm_process_status_info[vm_process_status].kubernetes_add_container){ // if container added to kubernetes
+                                            ret_code += "Kubernetes Add Container" + gap + tick;
+                                            ret_code += list_item_text_end;
+                                            ret_code += list_item_text_start;
+                                            if(msg.data.vm_process_status_info[vm_process_status].kubernetes_add_service){
+                                                ret_code += "Kubernetes Add Service" + gap + tick;
+                                                ret_code += list_item_text_end;
+                                                if(msg.data.vm_process_status_info[vm_process_status].process_name == "mysqld"){
+                                                    ret_code += list_item_text_start;
+                                                    if(msg.data.vm_process_status_info[vm_process_status].kubernetes_add_volume){
+                                                        ret_code += "Kubernetes Add Volume" + gap + tick;
+                                                        ret_code += list_item_text_end;
+                                                        ret_code += list_item_text_start;
+                                                        if(msg.data.vm_process_status_info[vm_process_status].kubernetes_transfer_data_to_volume){
+                                                            ret_code += "Kubernetes Transfer Data to Volume" + gap + tick;
+                                                            ret_code += list_item_text_end;
+                                                        }
+                                                        else{// K8S transfer data to volume
+                                                            ret_code += "Kubernetes Transfer Data to Volume" + gap + spinner;
+                                                            ret_code += list_item_text_end;
+                                                        }
+                                                    }
+                                                    else{// Kubernetes Add volume
+                                                        ret_code += "Kubernetes Add Volume" + gap + spinner;
+                                                        ret_code += list_item_text_end;
+                                                        ret_code += list_item_text_start;
+                                                        ret_code += "Kubernetes Transfer Data to Volume" + gap + spinner;
+                                                        ret_code += list_item_text_end;
+                                                    }
+                                                }
+                                            }
+                                            else{ //Kubernetes add service
+                                                ret_code += "Kubernetes Add Service" + gap + spinner;
+                                                ret_code += list_item_text_end;
+                                                if(msg.data.vm_process_status_info[vm_process_status].process_name == "mysqld"){
+                                                    ret_code += list_item_text_start;
+                                                    ret_code += "Kubernetes Add Volume" + gap + spinner;
+                                                    ret_code += list_item_text_end;
+                                                    ret_code += list_item_text_start;
+                                                    ret_code += "Kubernetes Transfer Data to Volume" + gap + spinner;
+                                                    ret_code += list_item_text_end;
+                                                }
+                                            }
+                                        }
+                                        else{//if container not added to kubernetes
+                                            ret_code += "Kubernetes Add Container" + gap + spinner;
+                                            ret_code += list_item_text_end;
+                                            ret_code += list_item_text_start;
+                                            ret_code += "Kubernetes Add Service" + gap + spinner;
+                                            ret_code += list_item_text_end;
+                                            if(msg.data.vm_process_status_info[vm_process_status].process_name == "mysqld"){
+                                                ret_code += list_item_text_start;
+                                                ret_code += "Kubernetes Add Volume" + gap + spinner;
+                                                ret_code += list_item_text_end;
+                                                ret_code += list_item_text_start;
+                                                ret_code += "Kubernetes Transfer Data to Volume" + gap + spinner;
+                                                ret_code += list_item_text_end;
+                                            }
+                                        }
+                                    }
+                                    else{// if container not pushed to docker registry
+                                        ret_code += "Push Container to Docker Registry" + gap + spinner;
+                                        ret_code += list_item_text_end;
+                                        ret_code += list_item_text_start;
+                                        ret_code += "Kubernetes Add Container" + gap + spinner;
+                                        ret_code += list_item_text_end;
+                                        ret_code += list_item_text_start;
+                                        ret_code += "Kubernetes Add Service" + gap + spinner;
+                                        ret_code += list_item_text_end;
+                                        if(msg.data.vm_process_status_info[vm_process_status].process_name == "mysqld"){
+                                            ret_code += list_item_text_start;
+                                            ret_code += "Kubernetes Add Volume" + gap + spinner;
+                                            ret_code += list_item_text_end;
+                                            ret_code += list_item_text_start;
+                                            ret_code += "Kubernetes Transfer Data to Volume" + gap + spinner;
+                                            ret_code += list_item_text_end;
+                                        }
+                                    }
+                                }
+                                else{ // If not build container
+                                    ret_code += "Build Container" + gap + spinner;
+                                    ret_code += list_item_text_end;
+                                    ret_code += list_item_text_start;
+                                    ret_code += "Push Container to Docker Registry" + gap + spinner;
+                                    ret_code += list_item_text_end;
+                                    ret_code += list_item_text_start;
+                                    ret_code += "Kubernetes Add Container" + gap + spinner;
+                                    ret_code += list_item_text_end;
+                                    ret_code += list_item_text_start;
+                                    ret_code += "Kubernetes Add Service" + gap + spinner;
+                                    ret_code += list_item_text_end;
+                                    if(msg.data.vm_process_status_info[vm_process_status].process_name == "mysqld"){
+                                        ret_code += list_item_text_start;
+                                        ret_code += "Kubernetes Add Volume" + gap + spinner;
+                                        ret_code += list_item_text_end;
+                                        ret_code += list_item_text_start;
+                                        ret_code += "Kubernetes Transfer Data to Volume" + gap + spinner;
+                                        ret_code += list_item_text_end;
+                                    }
+                                }
+                            }
+                            else{//If Container info not saved
+                                ret_code += "Save Container Info" + gap + spinner;
+                                ret_code += list_item_text_end;
+                                ret_code += list_item_text_start;
+                                ret_code += "Build Container" + gap + spinner;
+                                ret_code += list_item_text_end;
+                                ret_code += list_item_text_start;
+                                ret_code += "Push Container to Docker Registry" + gap + spinner;
+                                ret_code += list_item_text_end;
+                                ret_code += list_item_text_start;
+                                ret_code += "Kubernetes Add Container" + gap + spinner;
+                                ret_code += list_item_text_end;
+                                ret_code += list_item_text_start;
+                                ret_code += "Kubernetes Add Service" + gap + spinner;
+                                ret_code += list_item_text_end;
+                                if(msg.data.vm_process_status_info[vm_process_status].process_name == "mysqld"){
+                                    ret_code += list_item_text_start;
+                                    ret_code += "Kubernetes Add Volume" + gap + spinner;
+                                    ret_code += list_item_text_end;
+                                    ret_code += list_item_text_start;
+                                    ret_code += "Kubernetes Transfer Data to Volume" + gap + spinner;
+                                    ret_code += list_item_text_end;
+                                }
+                            }
+
+                        }
+                        else{ //If code not saved
+                            ret_code += "Save Code" + gap + tick;
+                            ret_code += list_item_text_end;
+                            ret_code += list_item_text_start;
+                            ret_code += "Save Container Info" + gap + spinner;
+                            ret_code += list_item_text_end;
+                            ret_code += list_item_text_start;
+                            ret_code += "Build Container" + gap + spinner;
+                            ret_code += list_item_text_end;
+                            ret_code += list_item_text_start;
+                            ret_code += "Push Container to Docker Registry" + gap + spinner;
+                            ret_code += list_item_text_end;
+                            ret_code += list_item_text_start;
+                            ret_code += "Kubernetes Add Container" + gap + spinner;
+                            ret_code += list_item_text_end;
+                            ret_code += list_item_text_start;
+                            ret_code += "Kubernetes Add Service" + gap + spinner;
+                            ret_code += list_item_text_end;
+                            if(msg.data.vm_process_status_info[vm_process_status].process_name == "mysqld"){
+                                ret_code += list_item_text_start;
+                                ret_code += "Kubernetes Add Volume" + gap + spinner;
+                                ret_code += list_item_text_end;
+                                ret_code += list_item_text_start;
+                                ret_code += "Kubernetes Transfer Data to Volume" + gap + spinner;
+                                ret_code += list_item_text_end;
+                            }
+                        }
+
+                    }
+                    else{ //Not Started Containerization
+                        ret_code += "Start Containerization" + gap + spinner;
+                        ret_code += list_item_text_end;
+                        ret_code += list_item_text_start;
+                        ret_code += "Save Code" + gap + spinner;
+                        ret_code += list_item_text_end;
+                        ret_code += list_item_text_start;
+                        ret_code += "Save Container Info" + gap + spinner;
+                        ret_code += list_item_text_end;
+                        ret_code += list_item_text_start;
+                        ret_code += "Build Container" + gap + spinner;
+                        ret_code += list_item_text_end;
+                        ret_code += list_item_text_start;
+                        ret_code += "Push Container to Docker Registry" + gap + spinner;
+                        ret_code += list_item_text_end;
+                        ret_code += list_item_text_start;
+                        ret_code += "Kubernetes Add Container" + gap + spinner;
+                        ret_code += list_item_text_end;
+                        ret_code += list_item_text_start;
+                        ret_code += "Kubernetes Add Service" + gap + spinner;
+                        ret_code += list_item_text_end;
+                        if(msg.data.vm_process_status_info[vm_process_status].process_name == "mysqld"){
+                            ret_code += list_item_text_start;
+                            ret_code += "Kubernetes Add Volume" + gap + spinner;
+                            ret_code += list_item_text_end;
+                            ret_code += list_item_text_start;
+                            ret_code += "Kubernetes Transfer Data to Volume" + gap + spinner;
+                            ret_code += list_item_text_end;
+                        }
+
+                    }
+                }
+            }
+
+            ret_code += list_div_end;
+        }
+    }
+
+    
+    
+
+    return ret_code;
 }
 function addEntryOnPage(data){
     var edit_button = "<button class='btn btn-xs btn-warning edit_vm'><i class='fa fa-edit'></i>&nbsp;&nbsp;Edit</button>&nbsp;&nbsp;";
     var delete_button = "<button class='btn btn-xs btn-danger remove_vm'><i class='fa fa-trash'></i>&nbsp;&nbsp;Remove</button><br>";
-    var vm_details = "<br><span id='details" + data.id + "' style='display: none'><h3>Containerization Not Started</h3></span>";
-    var vm_display = "<span><label>" + data.vm_username + "@" + data.vm_hostname + "</label></span><br>";
+    var vm_details = "<br><span id='details" + data.id + "' style='display: none'><h4>Containerization Not Started</h4></span>";
+    var vm_display = "<span><h4><label>" + data.vm_username + "@" + data.vm_hostname + "</label></h4></span>";
     var new_vm = "<div class='row' id=" + data.id + " style='margin: 1em; border: 1px solid grey; border-radius: 4px; padding: 1em; width: 95%'> \
                 <span style='float: right'>" + edit_button + delete_button + "</span>" + 
                 vm_display + 
-                "<br><button class='btn btn-sm btn-outline-info' id='show' onclick='showDetails(details" + data.id + ", this)'><label>Show status&nbsp;&nbsp;</label><i class='fa fa-angle-down'></i></button>" + 
+                "<button class='btn btn-sm btn-outline-info' id='show' onclick='showDetails(details" + data.id + ", this)'><label>Show status&nbsp;&nbsp;</label><i class='fa fa-angle-down'></i></button>" + 
                 vm_details + 
                 "</div>";
     $(".vm").append(new_vm);
