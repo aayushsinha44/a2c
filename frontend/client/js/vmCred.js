@@ -4,8 +4,6 @@ var ids = [];
 var pool_id = getCookie('poolid');
 
 
-
-
 // code on loading 
 $(window).on("load", function(){
     console.log(token);
@@ -214,6 +212,7 @@ $(document).ready(function(){
                 disableStartAndAddButtons();
 
                 console.log(msg);
+                document.location.reload(true);
             },
             error: function(xhr){
                 console.log(xhr.responseJSON.message, xhr);
@@ -246,20 +245,7 @@ function showDetails(id, t) {
     }
 }
 function getThisVMStatus(data){
-    var id = data.id;
-
-    
-
-
-    //console.log("before worker call " + id);
     worker(data);
-
-    //console.log(current_data + " " + id);
-
-    var code = '<br>hello, Hi there ' + id + '&nbsp;&nbsp;' + tick + '&nbsp;&nbsp;' + spinner;
-    //console.log("hello " + id);
-    //document.getElementById("details"+id).innerHTML = current_data;
-    
 }
 var spinner = '<i class="fa fa-circle-o-notch fa-spin"></i>';
 var tick = '<i class="fa fa-check" style="color:green"></i>';
@@ -288,7 +274,7 @@ function worker(d) {
             console.log("hi " + d.id);
 
             var ret_code="";
-            if(msg.data.pool_info["in_use"] == true){
+            if(true){
                 var id = d.id;
                 var vm_found_in_status_info = false;
 
@@ -313,7 +299,27 @@ function worker(d) {
                                     ret_code += "Process Discovery" + gap + tick;
                                     ret_code += list_item_heading_end;
                                     ret_code += displayProcessInfo(msg, id);
-
+                                    ret_code += list_item_heading_start;
+                                    if(msg.data.vm_status_info[vm_status].kubernetes_save_file){ //kubernetes save done
+                                        ret_code += "Kubernetes Save" + gap + tick;
+                                        ret_code += list_item_heading_end;
+                                        ret_code += list_item_heading_start;
+                                        if(msg.data.vm_status_info[vm_status].kubernetes_apply){ //kubernetes apply
+                                            ret_code += "Kubernetes Apply" + gap + tick;
+                                            ret_code += list_item_heading_end;
+                                        }
+                                        else{ // kubernetes not applied
+                                            ret_code += "Kubernetes Apply" + gap + spinner;
+                                            ret_code += list_item_heading_end;
+                                        }
+                                    }
+                                    else{ //kubernetes save not done
+                                        ret_code += "Kubernetes Save" + gap + spinner;
+                                        ret_code += list_item_heading_end;
+                                        ret_code += list_item_heading_start;
+                                        ret_code += "Kubernetes Apply" + gap + spinner;
+                                        ret_code += list_item_heading_end;
+                                    }
                                 }
                                 else{ // Process Discovery Not Done
                                     ret_code += "Process Discovery" + gap + spinner;
@@ -369,7 +375,7 @@ function worker(d) {
             else{ //Agent Not in use
                 document.location.reload(true);
             }
-            setTimeout(function() {getThisVMStatus(d);}, 4000);
+            setTimeout(function() {getThisVMStatus(d);}, 1500);
 
             document.getElementById("details"+id).innerHTML = ret_code;
         }
@@ -418,7 +424,7 @@ function displayProcessInfo(msg, id){
                                             if(msg.data.vm_process_status_info[vm_process_status].kubernetes_add_service){
                                                 ret_code += "Kubernetes Add Service" + gap + tick;
                                                 ret_code += list_item_text_end;
-                                                if(msg.data.vm_process_status_info[vm_process_status].process_name == "mysqld"){
+                                                if(msg.data.vm_process_info[vm_process].process_name == "mysqld"){
                                                     ret_code += list_item_text_start;
                                                     if(msg.data.vm_process_status_info[vm_process_status].kubernetes_add_volume){
                                                         ret_code += "Kubernetes Add Volume" + gap + tick;
@@ -461,7 +467,7 @@ function displayProcessInfo(msg, id){
                                             ret_code += list_item_text_start;
                                             ret_code += "Kubernetes Add Service" + gap + spinner;
                                             ret_code += list_item_text_end;
-                                            if(msg.data.vm_process_status_info[vm_process_status].process_name == "mysqld"){
+                                            if(msg.data.vm_process_info[vm_process].process_name == "mysqld"){
                                                 ret_code += list_item_text_start;
                                                 ret_code += "Kubernetes Add Volume" + gap + spinner;
                                                 ret_code += list_item_text_end;
@@ -480,7 +486,7 @@ function displayProcessInfo(msg, id){
                                         ret_code += list_item_text_start;
                                         ret_code += "Kubernetes Add Service" + gap + spinner;
                                         ret_code += list_item_text_end;
-                                        if(msg.data.vm_process_status_info[vm_process_status].process_name == "mysqld"){
+                                        if(msg.data.vm_process_info[vm_process].process_name == "mysqld"){
                                             ret_code += list_item_text_start;
                                             ret_code += "Kubernetes Add Volume" + gap + spinner;
                                             ret_code += list_item_text_end;
@@ -502,7 +508,7 @@ function displayProcessInfo(msg, id){
                                     ret_code += list_item_text_start;
                                     ret_code += "Kubernetes Add Service" + gap + spinner;
                                     ret_code += list_item_text_end;
-                                    if(msg.data.vm_process_status_info[vm_process_status].process_name == "mysqld"){
+                                    if(msg.data.vm_process_info[vm_process].process_name == "mysqld"){
                                         ret_code += list_item_text_start;
                                         ret_code += "Kubernetes Add Volume" + gap + spinner;
                                         ret_code += list_item_text_end;
@@ -527,7 +533,7 @@ function displayProcessInfo(msg, id){
                                 ret_code += list_item_text_start;
                                 ret_code += "Kubernetes Add Service" + gap + spinner;
                                 ret_code += list_item_text_end;
-                                if(msg.data.vm_process_status_info[vm_process_status].process_name == "mysqld"){
+                                if(msg.data.vm_process_info[vm_process].process_name == "mysqld"){
                                     ret_code += list_item_text_start;
                                     ret_code += "Kubernetes Add Volume" + gap + spinner;
                                     ret_code += list_item_text_end;
@@ -556,7 +562,7 @@ function displayProcessInfo(msg, id){
                             ret_code += list_item_text_start;
                             ret_code += "Kubernetes Add Service" + gap + spinner;
                             ret_code += list_item_text_end;
-                            if(msg.data.vm_process_status_info[vm_process_status].process_name == "mysqld"){
+                            if(msg.data.vm_process_info[vm_process].process_name == "mysqld"){
                                 ret_code += list_item_text_start;
                                 ret_code += "Kubernetes Add Volume" + gap + spinner;
                                 ret_code += list_item_text_end;
@@ -588,7 +594,7 @@ function displayProcessInfo(msg, id){
                         ret_code += list_item_text_start;
                         ret_code += "Kubernetes Add Service" + gap + spinner;
                         ret_code += list_item_text_end;
-                        if(msg.data.vm_process_status_info[vm_process_status].process_name == "mysqld"){
+                        if(msg.data.vm_process_info[vm_process].process_name == "mysqld"){
                             ret_code += list_item_text_start;
                             ret_code += "Kubernetes Add Volume" + gap + spinner;
                             ret_code += list_item_text_end;
@@ -629,7 +635,7 @@ function addEntryOnPage(data){
             type: "GET",
             beforeSend: function(xhr){xhr.setRequestHeader('token', token);},
             success: function(msg) { 
-                if(msg.data.pool_info["in_use"] == true){
+                if(msg.data.pool_info["in_use"] == true || pool_id){
                     getThisVMStatus(data);
                 }
             },
