@@ -109,19 +109,39 @@ class SSH:
 
         if is_folder:
 
-            _, output, _ = self.exec_command("find "+_client_path+" -type f")
-            output=output.split("\n")
+            try:
+                _, output, _ = self.exec_command("find "+_client_path+" -type l")
+                output=output.split("\n")
 
-            # Transfering files
-            for line in output:
-                if len(line) == 0:
-                    continue
-                _localpath=self.get_user_data_path()+'/'+process_path
-                if line[0]!='/':
-                    _localpath += '/'
-                self.get_file(line, _localpath+line)
-                Log.log("Transferring folder-file from "+line+" to "+_localpath+line, level="debug")
+                # Transfering files
+                for line in output:
+                    if len(line) == 0:
+                        continue
+                    _localpath=self.get_user_data_path()+'/'+process_path
+                    if line[0]!='/':
+                        _localpath += '/'
+                    self.get_file(line, _localpath+line)
+                    Log.log("Transferring folder-file from "+line+" to "+_localpath+line, level="debug")
+            except:
+                pass
 
+            try:
+                _, output, _ = self.exec_command("find "+_client_path+" -type f")
+                output=output.split("\n")
+
+                # Transfering files
+                for line in output:
+                    if len(line) == 0:
+                        continue
+                    _localpath=self.get_user_data_path()+'/'+process_path
+                    if line[0]!='/':
+                        _localpath += '/'
+                    self.get_file(line, _localpath+line)
+                    Log.log("Transferring folder-file from "+line+" to "+_localpath+line, level="debug")
+            except:
+                pass
+
+            
         else:
             _localpath=self.get_user_data_path()+'/'+process_path
             print("File ", client_path)

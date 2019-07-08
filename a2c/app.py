@@ -550,12 +550,15 @@ def logout_vm(username, hostname):
         return build_response({"message": str(e)}, code=500, success=False)
 
 @app.route('/kubernetes/get_services')
-def kubernetes_get_services(self):
-    _cmd='kubectl --kubeconfig kube_config_file get pods'
-    p = subprocess.Popen(_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output, _ = p.communicate()
+def kubernetes_get_services():
+    _cmd='kubectl --kubeconfig kube_config_file get services'
+    p = subprocess.Popen(_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    output, error = p.communicate()
+    error = str(error.decode())
     output = str(output.decode())
-    return build_response({"message"})
+    if error != "":
+        return build_response({"message": error}, code=400, success=False)
+    return build_response({"message": output})
 
 def clear():
     global RUNTIME, ssh, docker_client, PROCESS_LIST, kubernetes_object, _env

@@ -71,6 +71,7 @@ if __name__ == '__main__':
     mysql_db_password='aayush'
 
     client_data =[
+        ('ubuntu', 'intern1', '172.22.6.132'),
         ('ubuntu', 'intern1', '172.22.6.161'),
         ('ubuntu', 'intern1', '172.22.6.162')
     ]

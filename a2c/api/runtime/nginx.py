@@ -18,9 +18,10 @@ class Nginx(Runtime):
             }
         '''
         super().__init__(ssh_client, process_id, proccess_name, process_port, docker_client)
-        self._nginx_conf_files = self.nginx_conf_file()
         self._vm_data=vm_data
         self._critical_content = []
+        self._nginx_conf_files = self.nginx_conf_file()
+        
 
     # Abstract class method
     def generate_container_file(self):
@@ -47,7 +48,8 @@ class Nginx(Runtime):
         
         for data in self._critical_content:
             for vd in self._vm_data:
-                _docker_file.append("sed -i 's/"+vd+"/"+self._vm_data[vd]["process_name"]+"/g' "+data)
+                # print(vd, self._vm_data[vd][0]["process_name"])
+                _docker_file.append("RUN sed -i 's/"+vd+"/"+self._vm_data[vd][0]["process_name"]+"-service/g' "+data)
 
         # _docker_file.append('CMD ["service", "nginx", "start"]')
         _docker_file.append('RUN echo "daemon off;" >> /etc/nginx/nginx.conf')
@@ -144,7 +146,7 @@ class Nginx(Runtime):
                                 __path += '/'
                             cmd="cat "+__path+file
                             _, _out, _ = self.ssh_client.exec_command(cmd)
-                            self.__check_and_add_critical_content(out, __path+file)
+                            self.__check_and_add_critical_content(_out, __path+file)
                             # print("out", out)
                             # static files
                             _x = re.findall('root /.*' , _out)
@@ -159,7 +161,7 @@ class Nginx(Runtime):
         return files, conf_files
 
     def __check_and_add_critical_content(self, file_text, file_path):
-        
+
         check_flag=False
         # check
         for _data in self._vm_data:
@@ -169,6 +171,7 @@ class Nginx(Runtime):
 
         if check_flag:
             self._critical_content.append(file_path)
+        # print(file_text)
 
         
 
