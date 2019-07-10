@@ -5,63 +5,52 @@ $(window).on("load", function(){
     if (!token) {
         window.location.href="/frontend/client/login.html";
     }
-    var form = $('#vmform');
-    var flag = 0;
     $.ajax({
         url: "http://172.21.212.180:8000/get_services/",
         type: "GET",
         beforeSend: function(xhr){xhr.setRequestHeader('token', token);},
         success: function(msg) {
             console.log(msg);
-            document.getElementById("kubeser").innerHTML = msg.message.split(" ");
+            var array = msg.message.split(" ");
+            ret_code = "";
+            var table_start = '<table class="table table-striped" style="width:90%">';
+            var table_end = '</table>';
+
+            ret_code += table_start;
+            ret_code += '<thead>';
+            ret_code += '<tr>';
+            ret_code += '<th>' + array[0] + '</th><th>' + array[1] + '</th><th>' + array[2] + '</th><th>' + array[3] + '</th><th>' + array[4] + '</th><th>' + array[5].split("\n")[0] + '</th>';
+            ret_code += '</tr>';
+            ret_code += '</thead>';
+            ret_code += '<tbody>';
+            ret_code += '<tr>';
+            ret_code += '<td>' + array[5].split("\n")[1] + '</td><td>' + array[6] + '</td><td>' + array[7] + '</td><td>' + '\<none\>' + '</td><td>' + array[9] + '</td><td>' + array[10].split("\n")[0] + '</td>';
+            ret_code += '</tr>';
+
+            array = msg.message.split("\n");
+
+            for(ele in array){
+                if(ele!=0 && ele!=1){
+                    line = array[ele].split(" ");
+                    if(line.length <= 1)
+                        continue;
+                    ret_code += '<tr>';
+                    for(word in line){
+                        ret_code += '<td>';
+                        ret_code += line[word];
+                        ret_code += '</td>';
+                    }
+                    ret_code += '</tr>';
+                    
+                }
+            }
+            ret_code += '</tbody>';
+            ret_code += table_end;
+            document.getElementById("kubeser").innerHTML = ret_code;
         },
-        error: function(xhr){console.log(xhr.responseJSON.message, xhr);}
+        error: function(xhr){
+            console.log(xhr.responseJSON.message, xhr);
+            document.getElementById("kubeser").innerHTML = xhr.responseJSON.message;
+        }
     });
 });
-
-// $(document).ready(function(){
-//     var token = getCookie('user_token');
-//     console.log(token);
-//     if (!token) {
-//         window.location.href="/frontend/client/login.html";
-//     }
-//     var form = $('#doc_reg');
-//     $.ajax({
-//         url: $(form).attr("action"),
-//         type: "GET",
-//         beforeSend: function(xhr){xhr.setRequestHeader('token', token);},
-//         success: function(msg) { 
-//             //alert('Success!' + token); 
-//             console.log(msg);
-//             document.getElementById("regis").value = msg.message.docker_registry;
-//             document.getElementById("uname").value = msg.message.docker_registry_username;
-//             document.getElementById("pwd").value = msg.message.docker_registry_password;
-//         },
-//         error: function(xhr){console.log(xhr.responseJSON.message, xhr);}
-//     });
-
-//     $(document).on("click", "#submit",function(){
-//         var data = document.getElementById("doc_reg");
-//         //console.log(form);
-//         var registry = data.registry.value;
-//         var username = data.username.value;
-//         var password = data.pswd.value;
-
-//         $.ajax({
-//             url: $(form).attr("action"),
-//             type: $(form).attr("method"),
-//             data: JSON.stringify({
-//                 docker_registry_username: username,
-//                 docker_registry_password: password,
-//                 docker_registry: registry
-//             }),
-//             beforeSend: function(xhr){xhr.setRequestHeader('token', token);},
-//             dataType: 'json',
-//             success: function (data) {
-//                 console.info(data);
-//                 window.location.href="/frontend/client/dashboard.html";
-//             },
-//             error: function(xhr){console.log("hi" + xhr.responseJSON.message, xhr);}
-//         });
-//     });
-// });

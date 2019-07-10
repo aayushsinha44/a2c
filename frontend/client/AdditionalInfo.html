@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Template</title>
+    <title>Additional Information</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="styles/dashboard.css">
@@ -61,8 +61,18 @@
                 </div>
                 <div class="row" style="padding: 1em;">
                     <span id="error"></span>
-                    dlfkjl;dskjf;ldksjf edjflsdkjflksdjf<br>
-                    dsfkjlsdkjfl;kdsjfl;kdjf<br>
+                    <h1>MySQL Details(if any)</h1><br/><br/>
+                    <form >
+                        <div class="form-group">
+                            <label for="mysuser">MySQL Username:</label>
+                            <input type="text" class="form-control" id="mysuser" placeholder="Enter MySQL Username" name="agent_ip" style="width: 80%" value="aayush">
+                        </div> 
+                        <div class="form-group">
+                            <label for="mysqlpass">MySQL Password:</label>
+                            <input type="text" class="form-control" id="mysqlpass" placeholder="Enter MySQL Password" name="agent_ip" style="width: 80%" value="aayush">
+                        </div>                       
+                        <button type="button" class="btn btn-primary" id="submit" onclick='window.location.href="/frontend/client/vmCred.html"'>Save</button>
+                    </form>
                 </div>
             </div>
         </div>
