@@ -551,7 +551,7 @@ def logout_vm(username, hostname):
 
 @app.route('/kubernetes/get_services')
 def kubernetes_get_services():
-    _cmd='kubectl --kubeconfig kube_config_file get services'
+    _cmd='kubectl --kubeconfig kube_config_file get services | awk \'{print $1, $2, $3, $4, $5, $6}\''
     p = subprocess.Popen(_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     output, error = p.communicate()
     error = str(error.decode())
